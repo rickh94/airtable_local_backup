@@ -2,3 +2,5 @@
 tmpdata
 *.tmp
 *.gz
+backupdata.sh
+big-binaries

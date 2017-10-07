@@ -1,0 +1,22 @@
+make an actual program from the piles of code
+test with binary attachments
+add compression support
+create structure for storing various json files (directories and zip file? aws
+prefix, etc.) Need to decide whether one big file handled internally or
+directory of files (both?)
+figure out a way to deal with linked records
+profile compression of attachments vs compression of final file, vs both
+add native support for s3 and digitalocean for backing store and attachment restore
+add multipart uploading
+add yaml config file support
+expose and document api
+add buffered io writing
+publish to pypi
+
+create cli as part of package or separate
+possible:
+create csv
+scripts for deployment to aws lambda and s3
+api gateway for configuration?
+add support for writing out to other type of database (e.g. tinydb, mongodb,
+etc) what to do with blobs?

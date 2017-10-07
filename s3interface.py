@@ -14,10 +14,10 @@ def make_url(filename, bucket):
     # try:
     s3client.upload_file(filename, bucket, basename)
     # except OSError:
-        # logger.error(
-        #     '{} could not be found. File will not be uploaded.'.format(
-        #         filename))
-        # raise exceptions.NoAttachmentError
+    #    logger.error(
+    #        '{} could not be found. File will not be uploaded.'.format(
+    #            filename))
+    #    raise exceptions.NoAttachmentError
     # except botocore.exceptions.BotoCoreError as err:
     #     logger.error('{} could not be uploaded to s3. Details: {}'.format(
     #         filename, err))

@@ -5,10 +5,13 @@ import json
 import requests
 import base64
 
+outfilename = os.environ['OUTFILE']
+outpath = os.environ['OUTPATH']
+outfile = Path(outpath, outfilename)
 
 table = airtable.Airtable(base_key=os.environ['ATDB'],
                           api_key=os.environ['ATKEY'],
-                          table_name='giant_table')
+                          table_name=os.environ['TABLE'])
 
 table_data = table.get_all()
 
@@ -32,7 +35,7 @@ def findkeys(node, kv):
                 yield x
 
 
-basepath = Path('tmpdata')
+basepath = Path(outpath)
 newrecords = []
 keys = []
 
@@ -40,7 +43,7 @@ for record in table_data:
     newdata = {}
     for key, value in record['fields'].items():
         if key not in keys:
-            kes.append(key)
+            keys.append(key)
         if list(findkeys(value, 'url')):
             filedata = []
             for item in value:
@@ -56,19 +59,6 @@ for record in table_data:
             newdata[key] = value
     newrecords.append(newdata)
 
-with open('everything.json', 'w') as datafile:
+
+with open(outfile, 'w') as datafile:
     json.dump(newrecords, datafile, indent=2)
-# print(json.dumps(newrecords, indent=2))
-# for item in newrecords:
-#     for rec in item['Attachments']:
-#         print(rec['filename'])
-#         print(base64.b64decode(rec['data']))
-#
-# for record in table_data[0:2]:
-#     # print('recid: {}'.format(record['id']))
-#     for num, item in enumerate(findkeys(record, 'url')):
-#         data = requests.get(item)
-#         filespath = Path(basepath, str(record['id']))
-#         os.makedirs(filespath, exist_ok=True)
-#         with open(Path(filespath, 'attach' + str(num)), 'wb') as datafile:
-#             datafile.write(data.content)

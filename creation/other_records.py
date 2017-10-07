@@ -1,50 +1,31 @@
-from airtable.airtable import Airtable
+from airtable import Airtable
 import s3interface
 from pathlib import Path
 import os
 from uuid import uuid4
 from time import sleep
-import names
 import random
 from random_words import RandomWords
 
-db = Airtable(api_key=os.environ['ATKEY'],
-              base_id=os.environ['ATDB'])
-basepath = Path('/home', 'rick', 'tmp', 'garbagefiles')
+table = Airtable(api_key=os.environ['ATKEY'],
+                 base_key=os.environ['ATDB'],
+                 table_name='Sheet Music')
+basepath = Path('..', 'big-binaries')
 
-for i in range(0, 200):
-    sleep(0.1)
-    filepath1 = Path(basepath, 'file' + str(i) + '.txt')
-    url1 = s3interface.make_url(filename=str(filepath1),
-                                bucket='ricksencryptedbucket')
-    filepath2 = Path(basepath, 'file' + str((i + 201)) + '.txt')
-    url2 = s3interface.make_url(filename=str(filepath2),
-                                bucket='ricksencryptedbucket')
-    attach = [{'url': url1}, {'url': url2}]
+
+for pdf in os.listdir(basepath)[0:100]:
+    filepath = Path(basepath, pdf)
+    url = s3interface.make_url(filename=str(filepath),
+                               bucket='ricksencryptedbucket')
+    attach = [{'url': url}]
     rw = RandomWords()
+    UUID = str(uuid4())
     words = ' '.join(rw.random_words(count=10))
     check = bool(random.randrange(0, 2))
     randomdata = {
-        'ID': i,
+        'Name': pdf,
         'Notes': words,
         'Attachments': attach,
-        'Check': check
     }
     # print(randomdata)
-    db.create('Random Data', randomdata)
-
-    fname = names.get_first_name()
-    lname = names.get_last_name()
-    email = fname[0].lower() + lname.lower() + '@example.com'
-    a = random.randrange(0, 999)
-    b = random.randrange(0, 999)
-    c = random.randrange(0, 9999)
-    phone = '{:03d}-{:03d}-{:04d}'.format(a, b, c)
-    contactdata = {
-        'Last Name': lname,
-        'First Name': fname,
-        'Email Address': email,
-        'Phone Number': phone
-    }
-    # print(contactdata)
-    db.create('Contacts', contactdata)
+    table.insert(randomdata)

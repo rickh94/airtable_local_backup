@@ -30,7 +30,7 @@ for key, value in olddata['fields'].items():
     urls = list(findkeys(value, 'url'))
     if urls:
         paths = os.listdir(filedir)
-        newdata[key] = paths
+        newdata[key] = [paths]
     else:
         newdata[key] = value
 
