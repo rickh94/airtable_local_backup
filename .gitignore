@@ -4,3 +4,4 @@ tmpdata
 *.gz
 backupdata.sh
 big-binaries
+scratch

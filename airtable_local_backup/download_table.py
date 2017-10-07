@@ -5,7 +5,7 @@ import json
 import requests
 import base64
 
-outfilename = os.environ['OUTFILE']
+outfilename = os.environ['OUTFILE'].replace('/', '_')
 outpath = os.environ['OUTPATH']
 outfile = Path(outpath, outfilename)
 
