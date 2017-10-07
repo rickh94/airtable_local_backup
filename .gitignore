@@ -1,3 +1,4 @@
 *.txt
 tmpdata
 *.tmp
+*.gz

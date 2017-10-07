@@ -34,10 +34,13 @@ def findkeys(node, kv):
 
 basepath = Path('tmpdata')
 newrecords = []
+keys = []
 
 for record in table_data:
     newdata = {}
     for key, value in record['fields'].items():
+        if key not in keys:
+            kes.append(key)
         if list(findkeys(value, 'url')):
             filedata = []
             for item in value:

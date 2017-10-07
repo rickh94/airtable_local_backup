@@ -33,20 +33,15 @@ with open('everything.json', 'r') as datafile:
     data = json.load(datafile)
 
 assert len(data) == 501
-newrecords = []
-for record in data[0:3]:
+for record in data:
     newdata = {}
-    print(record)
+    # print(record)
     for key, value in record.items():
         if list(findkeys(value, 'filename')):
             urls = []
             for item in value:
                 filename = 'atrestoretest/' + item['filename']
-                # print(filename)
-                # print(base64.b64decode(item['data']))
                 upload = s3.Object(BUCKET, filename)
-                upload.put(Body=base64.b64decode(item['data']))
-                upload.put(Body=base64.b64decode(item['data']))
                 upload.put(Body=base64.b64decode(item['data']))
                 url = s3client.generate_presigned_url(
                     ClientMethod='get_object',
@@ -59,6 +54,6 @@ for record in data[0:3]:
             newdata[key] = urls
         else:
             newdata[key] = value
-    newrecords.append(newdata)
+    table.insert(newdata)
 
-print(json.dumps(newrecords, indent=2))
+# print(json.dumps(newrecords, indent=2))
