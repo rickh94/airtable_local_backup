@@ -21,18 +21,19 @@ def findkeys(node, kv):
                 yield x
 
 
+INFILEPATH = Path(os.environ['INPATH'], os.environ['INFILE'])
 BUCKET = os.environ['UPBUCKET']
 table = airtable.Airtable(base_key=os.environ['ATDBNEW'],
                           api_key=os.environ['ATKEY'],
-                          table_name='giant_table')
+                          table_name=os.environ['TABLE'])
 
 s3 = boto3.resource('s3')
 s3client = boto3.client('s3')
 
-with open('everything.json', 'r') as datafile:
+with open(INFILEPATH, 'r') as datafile:
     data = json.load(datafile)
 
-assert len(data) == 501
+
 for record in data:
     newdata = {}
     # print(record)
