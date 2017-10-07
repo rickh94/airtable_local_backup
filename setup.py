@@ -29,10 +29,7 @@ setup(
     install_requires=[
         'requests',
         'airtable_python_wrapper',
-        'html2text',
-        'nameparser',
         'boto3',
-        'daiquiri',
     ],
 
 )

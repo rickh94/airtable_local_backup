@@ -5,9 +5,13 @@ name = "pypi"
 
 [packages]
 
-ptpython = "*"
-pytest = "*"
 "e1839a8" = {path = ".", editable = true}
+requests = "*"
+"airtable-python-wrapper" = "*"
+"boto3" = "*"
+
+
 
 
 [dev-packages]
+ptpython = "*"
