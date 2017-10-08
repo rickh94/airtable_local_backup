@@ -2,6 +2,7 @@ import base64
 import airtable
 import requests
 import lzma
+from hashlib import md5
 
 
 def findkeys(node, kv):
@@ -59,6 +60,7 @@ class DownloadTable(list):
                     filedata = []
                     for item in value:
                         download = requests.get(item['url'])
+                        filehash = md5(download.content).hexdigest()
                         if self.compression:
                             data = lzma.compress(download.content)
                         else:
@@ -68,6 +70,7 @@ class DownloadTable(list):
                             'filename': item['filename'],
                             'data': encoded.decode('utf-8'),
                             'compressed': self.compression,
+                            'md5hash': str(filehash)
                         }
                         filedata.append(fileinfo)
                     newdata[key] = filedata
