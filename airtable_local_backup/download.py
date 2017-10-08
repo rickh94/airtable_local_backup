@@ -1,21 +1,10 @@
+"""Functions for downloading items from airtable."""
 import base64
-import airtable
-import requests
 import lzma
 from hashlib import md5
-
-
-def findkeys(node, kv):
-    if isinstance(node, list):
-        for i in node:
-            for x in findkeys(i, kv):
-                yield x
-    elif isinstance(node, dict):
-        if kv in node:
-            yield node[kv]
-        for j in node.values():
-            for x in findkeys(j, kv):
-                yield x
+import airtable
+import requests
+from airtable_local_backup import common
 
 
 class DownloadTable(list):
@@ -31,7 +20,6 @@ class DownloadTable(list):
     Returns:
         A generator that will yield all the data in the table.
     """
-    # TODO: add option flags for: compression
     # TODO: add optional dict of keys for recording the fields
     def __init__(self, base_key, table_name, api_key=None, progress=False,
                  compression=True):
@@ -56,7 +44,7 @@ class DownloadTable(list):
             for key, value in record['fields'].items():
                 # if key not in keys:
                 #     keys.append(key)
-                if list(findkeys(value, 'url')):
+                if list(common._findkeys(value, 'url')):
                     filedata = []
                     for item in value:
                         download = requests.get(item['url'])
