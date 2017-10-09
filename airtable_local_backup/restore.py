@@ -8,26 +8,22 @@ from airtable_local_backup import exceptions
 from airtable_local_backup import common
 
 
-def upload_attachment(item, bucket, prefix='', check_itegrity=True):
+def decode_file(item, check_integrity=True):
     """
-    Uploads a file for attachment to airtable record.
+    Decodes filedata store in backup dumps.
 
     Arguments:
-        item: dict from a DownloadTable containing all the data for an attached
-        file.
-        bucket: the s3 bucket for uploading attachments temporarily.
-        prefix: the prefix to append to objects uploaded to s3 (include slash
-        if it should look like a folder).
-        check_integrity: Flag for whether to check the file against the stored
-        hash.
+        item: the file data to decode
+        check_integrity: bool- flag whether to check the resulting data against
+        the stored hash.
 
-    Returns: presigned url for the temporary object to pass to airtable for
-    download.
+    Returns: dict: {'filename': name of the file, 'data': (bytes)decoded data}
+    This data could be used as:
+        with open(return['filename'], 'wb') as outfile:
+            outfile.write(return['data']
+
+    Raises DataCorruptionError if integrity check fails.
     """
-    s3 = boto3.resource('s3')
-    s3client = boto3.client('s3')
-    filename = prefix + item['filename']
-    upload = s3.Object(bucket, filename)
     filedata = base64.b64decode(item['data'])
     if item['compressed']:
         body = lzma.decompress(filedata)
@@ -39,7 +35,29 @@ def upload_attachment(item, bucket, prefix='', check_itegrity=True):
             raise exceptions.DataCorruptionError(
                 'file: {} failed the data integrity check, '
                 'and may be corrupted.')
-    upload.put(Body=body)
+    return {'filename': item['filename'], 'data': filedata}
+
+
+def upload_attachment(item, bucket, prefix=''):
+    """
+    Uploads a file for attachment to airtable record.
+
+    Arguments:
+        item: dict from decode_file containing decoded file info
+        bucket: the s3 bucket for uploading attachments temporarily.
+        prefix: the prefix to append to objects uploaded to s3 (include slash
+        if it should look like a folder).
+
+    Returns: presigned url for the temporary object to pass to airtable for
+    download.
+    """
+    s3client = boto3.client('s3')
+    filename = prefix + item['filename']
+    # TODO: investigate sending md5 hash along to aws
+    upload = s3client.put_object(Bucket=bucket,
+                                 Key=filename,
+                                 Body=item['data'],
+                                 ServerSideEncryption='AES256')
     return s3client.generate_presigned_url(
         ClientMethod='get_object',
         Params={
@@ -73,11 +91,11 @@ def read_data(table_data, attach_info=None):
                 if not attach_info:
                     continue
                 for item in value:
-                    url = upload_attachment(item=item,
+                    filedata = decode_file(
+                        item, check_integrity=attach_info['check_itegrity'])
+                    url = upload_attachment(item=filedata,
                                             bucket=attach_info['s3'],
                                             prefix=attach_info['prefix'],
-                                            check_integrity=attach_info[
-                                                'check_itegrity'],
                                             )
                     urls.append({'url': url})
                 newdata[key] = urls
