@@ -1,5 +1,7 @@
 Airtable Local Backup - IN PROGRESS
 ===================================
+.. image:: https://travis-ci.org/rickh94/airtable_local_backup.svg?branch=master
+    :target: https://travis-ci.org/rickh94/airtable_local_backup
 
 The goal of this project is to provide an easy way to backup data from
 Airtable without too much user intervention. (The current recommended
