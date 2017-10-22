@@ -2,6 +2,7 @@ import os
 import json
 import tempfile
 import pickle
+from tqdm import tqdm
 from airtable_local_backup import download
 from airtable import Airtable
 
@@ -12,16 +13,20 @@ TABLE = os.environ['TABLE']
 def main():
     table = Airtable(base_key=BASE, table_name=TABLE)
     data = table.get_all()
-    with open('tests/lots_of_fields_raw.pickle', 'wb') as datafile:
-        pickle.dump(data, datafile)
+    # with open('tests/lots_of_fields_raw.pickle', 'wb') as datafile:
+    #     pickle.dump(data, datafile)
 
-    all_data = list(download.DownloadTable(base_key=BASE, table_name=TABLE,
-                                           progress=False))
-    with open('tests/lots_of_fields_data.pickle', 'wb') as datafile:
-        pickle.dump(all_data, datafile)
+    downloadtable = download.DownloadTable(base_key=BASE, table_name=TABLE)
+    all_data = []
+    for item in downloadtable.download_table():
+        all_data.append(item)
 
-    with open('tests/lots_of_fields.json', 'w') as jsonfile:
-        json.dump(all_data, jsonfile)
+    # all_data = list(downloadtable.download_table())
+    # with open('tests/lots_of_fields_data.pickle', 'wb') as datafile:
+    #     pickle.dump(all_data, datafile)
+
+    with open('/tmp/test_lots_of_fields.json', 'w') as jsonfile:
+        json.dump(all_data, jsonfile, indent=2)
     # print(json.dumps(list(all_data), indent=2))
     # for item in all_data:
     #     tmpdata.write(

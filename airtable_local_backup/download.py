@@ -27,8 +27,6 @@ class DownloadTable(list):
         self.base_key = base_key
         self.table_name = table_name
         self.api_key = api_key
-        self.downloaded = 0
-        self.progress = progress
         self.compression = compression
 
     def download_table(self):
@@ -46,25 +44,28 @@ class DownloadTable(list):
                 if list(common._findkeys(value, 'url')):
                     filedata = []
                     for item in value:
-                        download = requests.get(item['url'])
-                        filehash = md5(download.content).hexdigest()
-                        if self.compression:
-                            data = lzma.compress(download.content)
-                        else:
-                            data = download.content
-                        encoded = base64.b64encode(data)
-                        fileinfo = {
-                            'filename': item['filename'],
-                            'data': encoded.decode('utf-8'),
-                            'compressed': self.compression,
-                            'md5hash': str(filehash)
-                        }
+                        fileinfo = _get_attach(item['filename'],
+                                               item['url'],
+                                               self.compression)
                         filedata.append(fileinfo)
                     newdata[key] = filedata
                 else:
                     newdata[key] = value
-            self.downloaded += 1
-            if self.progress:
-                print('Downloaded: {}'.format(self.downloaded))
             yield newdata
         # self.data = list of all the parsed records.
+
+
+def _get_attach(filename, url, compression):
+    download = requests.get(url)
+    filehash = md5(download.content).hexdigest()
+    if compression:
+        data = lzma.compress(download.content)
+    else:
+        data = download.content
+    encoded = base64.b64encode(data)
+    return {
+        'filename': filename,
+        'data': encoded.decode('utf-8'),
+        'compressed': compression,
+        'md5hash': str(filehash)
+    }

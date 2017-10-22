@@ -14,8 +14,11 @@ airtable-python-wrapper = "*"
 "s3po" = "*"
 fs = "*"
 "fs-s3fs" = "*"
+pytest-cov = "*"
 
 
 [dev-packages]
 
 ptpython = "*"
+tqdm = "*"
+pytest = "*"

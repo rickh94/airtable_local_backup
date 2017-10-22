@@ -1,10 +1,8 @@
 from os import path
 from setuptools import setup, find_packages
-import subprocess
 
 HERE = path.abspath(path.dirname(__file__))
-out = subprocess.run(['git', 'show-ref'], stdout=subprocess.PIPE)
-VERS = out.stdout.decode('utf-8')[0:7]
+VERS = '0.1a'
 DESC = 'Script to create local backups from airtable databases'
 
 with open(path.join(HERE, 'README.rst'), 'r') as f:
@@ -31,5 +29,7 @@ setup(
         'airtable_python_wrapper',
         'boto3',
     ],
+    tests_require=['pytest', 'pytest-cov'],
+    setup_requires=['pytest-runner'],
 
 )
