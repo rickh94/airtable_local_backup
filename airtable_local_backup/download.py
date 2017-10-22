@@ -7,6 +7,7 @@ import requests
 from airtable_local_backup import common
 
 
+# change this to inherit from the airtable.Airtable object
 class DownloadTable(list):
     """
     Downloads all data from a table including atachments.
@@ -30,14 +31,12 @@ class DownloadTable(list):
         self.progress = progress
         self.compression = compression
 
-    def __iter__(self):
-        return self._download_table()
-
-    def _download_table(self):
+    def download_table(self):
         table = airtable.Airtable(base_key=self.base_key,
                                   api_key=self.api_key,
                                   table_name=self.table_name)
         table_data = table.get_all()
+        # possibly discretize loop into its own function
         for record in table_data:
             # newrecords.append(extract_record(record))
             newdata = {}
@@ -68,3 +67,4 @@ class DownloadTable(list):
             if self.progress:
                 print('Downloaded: {}'.format(self.downloaded))
             yield newdata
+        # self.data = list of all the parsed records.
