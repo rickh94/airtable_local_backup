@@ -9,6 +9,7 @@ before_install:
   - pip install codecov
   - pip install pytest
   - pip install pytest-cov
+
 script: python setup.py test
 
 after_success:
