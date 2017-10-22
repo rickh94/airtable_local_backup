@@ -4,7 +4,6 @@ python:
   - "3.6"
   - "3.6.1"
   - "3.6.2"
-  - "pypy3"
 
 before_install:
   - pip install codecov

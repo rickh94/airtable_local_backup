@@ -3,6 +3,11 @@ Airtable Local Backup - IN PROGRESS
 .. image:: https://travis-ci.org/rickh94/airtable_local_backup.svg?branch=master
     :target: https://travis-ci.org/rickh94/airtable_local_backup
 
+
+.. image:: https://codecov.io/gh/rickh94/airtable_local_backup/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/rickh94/airtable_local_backup
+
+
 The goal of this project is to provide an easy way to backup data from
 Airtable without too much user intervention. (The current recommended
 solution is download individual csv files and attachments and correlate them

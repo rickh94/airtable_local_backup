@@ -26,7 +26,7 @@ setup(
 
     install_requires=[
         'requests',
-        'airtable-python-wrapper',
+        'airtable_python_wrapper',
         'boto3',
     ],
     tests_require=['pytest', 'pytest-cov'],
