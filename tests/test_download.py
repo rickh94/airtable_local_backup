@@ -1,41 +1,8 @@
-import base64
-import json
-import lzma
-import os
-from pathlib import Path
-
 from airtable import Airtable
 import requests
 import pytest
 
 from airtable_local_backup import download
-
-HERE = os.path.dirname(__file__)
-
-
-@pytest.fixture
-def lots_of_fields_raw():
-    with open(Path(HERE, 'lots_of_fields_raw.json'), 'r') as jsonfile:
-        return json.load(jsonfile)
-    # return fake_tabledata
-
-
-@pytest.fixture
-def lots_of_fields_hashes():
-    with open(Path(HERE, 'hashes.json'), 'r') as jsonfile:
-        return json.load(jsonfile)
-
-
-@pytest.fixture
-def filedata():
-    with open(Path(HERE, 'filedata.json'), 'r') as jsonfile:
-        return json.load(jsonfile)
-
-
-@pytest.fixture
-def lots_of_fields_correct():
-    with Path(HERE, 'lots_of_fields.json').open(mode='r') as jsonfile:
-        return json.load(jsonfile)
 
 
 def rettrue(*args):

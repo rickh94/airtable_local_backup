@@ -1,6 +1,7 @@
 import os
 import boto3
 import json
+import re
 from pathlib import Path
 import hashlib
 import tempfile
@@ -8,8 +9,16 @@ from fs.copy import copy_fs
 from fs.errors import ResourceNotFound
 
 
+def _normalize(name):
+    """Clean up the names."""
+    if name is None:
+        return None
+    clean = re.sub(r'[-_\s]+', '_', name.strip())
+    return clean.lower()
+
+
 def _make_file_name(tablename, prefix, suffix):
-    return prefix + tablename + suffix + '.json'
+    return prefix + _normalize(tablename) + suffix + '.json'
 
 
 def _write_to_file(downloadtable, tmpfs, prefix='', suffix=''):
@@ -19,13 +28,19 @@ def _write_to_file(downloadtable, tmpfs, prefix='', suffix=''):
         downloadtable: A DownloadTable object for the table to be saved
         filesystem: the temporary filesystem (from pyfilesystem2) to write the
             file to.
-        prefix: A prefix for a the file name
+        prefix: A prefix for a the file name. include a / for directories
         suffix: the suffix to append to the file name
     """
-    data = list(dowloadtable)
+    data = list(downloadtable.download_table())
     filename = _make_file_name(downloadtable.table_name, prefix, suffix)
+    if '/' in prefix:
+        tmpfs.makedir(prefix)
+    tagged_data = {
+        'table_name': downloadtable.table_name,
+        'data': data
+    }
     with tmpfs.open(filename, 'w') as outfile:
-        json.dump(data, outfile, indent=2)
+        json.dump(tagged_data, outfile, indent=2)
 
 
 def _join_files(tmpfs, outfs):
