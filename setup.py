@@ -28,6 +28,8 @@ setup(
         'requests',
         'airtable_python_wrapper',
         'boto3',
+        'fs',
+        'fs-s3fs',
     ],
     tests_require=['pytest', 'pytest-cov'],
     setup_requires=['pytest-runner'],
