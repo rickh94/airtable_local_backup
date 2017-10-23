@@ -92,16 +92,20 @@ def test_write_out_backup(tmpdir_factory, filedata, tarfile, tmp_fs):
     testdir2 = tmpdir_factory.mktemp('write_out_backup_2')
     testdir3 = tmpdir_factory.mktemp('write_out_backup_3')
     testdir4 = tmpdir_factory.mktemp('write_out_backup_4')
+    testdir5 = tmpdir_factory.mktemp('write_out_backup_5')
     back_fs1 = fs.open_fs(str(testdir1))
     back_fs2 = fs.open_fs(str(testdir2))
     back_fs3 = fs.open_fs(str(testdir3))
     back_fs4 = fs.open_fs(str(testdir4))
+    back_fs5 = fs.open_fs(str(testdir5))
     file_io._write_out_backup([back_fs1, back_fs2],
                               filepath=tarfile)
     file_io._write_out_backup(back_fs3,
                               filesystem=tmp_fs, prefix='hi/')
     file_io._write_out_backup(back_fs4,
                               filesystem=tmp_fs, prefix='hi')
+    file_io._write_out_backup(back_fs5,
+                              filesystem=tmp_fs)
     assert 'stuff.tar' in back_fs1.listdir('/')
     assert 'stuff.tar' in back_fs2.listdir('/')
     back_fs1.close()
@@ -115,9 +119,12 @@ def test_write_out_backup(tmpdir_factory, filedata, tarfile, tmp_fs):
             assert value in testfile
         assert key in back_fs3.listdir('/hi')
         assert key in back_fs4.listdir('/hi')
+        assert key in back_fs5.listdir('/')
         with back_fs3.open('hi/' + key) as testfile:
             assert value in testfile
         with back_fs4.open('hi/' + key) as testfile:
+            assert value in testfile
+        with back_fs5.open(key) as testfile:
             assert value in testfile
 
     with pytest.raises(AttributeError):
