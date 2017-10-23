@@ -1,9 +1,11 @@
 import os
+from pathlib import Path
 
 from airtable import Airtable
 import requests
 import pytest
 import fs
+from fs import tarfs
 
 from airtable_local_backup import file_io
 from airtable_local_backup import download
@@ -51,3 +53,20 @@ def test_write_to_file(filedata, lots_of_fields_raw, monkeypatch, tmpdir):
         assert 'md5hash' in data
         assert 'compressed' in data
         assert 'file15.txt' in data
+
+
+def test_join_files(tmpdir_factory, filedata):
+    tmpdir = tmpdir_factory.mktemp('test_join_files_files_in')
+    tardir = tmpdir_factory.mktemp('test_join_files_tar_out')
+    test_tmpfs = fs.open_fs(str(tmpdir))
+    for key, value in filedata.items():
+        with test_tmpfs.open(key, 'w') as tmpfile:
+            tmpfile.write(value)
+    test_outfs = tarfs.TarFS(str(Path(tardir, 'testtar.tar.xz')),
+                             compression='xz', write=True)
+    file_io._join_files(test_tmpfs, test_outfs)
+    for key, value in filedata.items():
+        assert key in test_outfs.listdir('/')
+        with test_outfs.open(key, 'r') as outfile:
+            assert value in outfile.read()
+    test_outfs.close()
