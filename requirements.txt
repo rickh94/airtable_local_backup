@@ -1,2 +1,4 @@
 airtable_python_wrapper
 requests
+fs
+fs-s3fs

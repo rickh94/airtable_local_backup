@@ -11,14 +11,12 @@ name = "pypi"
 requests = "*"
 airtable-python-wrapper = "*"
 "boto3" = "*"
-"s3po" = "*"
 fs = "*"
 "fs-s3fs" = "*"
-pytest-cov = "*"
 
 
 [dev-packages]
 
 ptpython = "*"
-tqdm = "*"
 pytest = "*"
+pytest-cov = "*"
