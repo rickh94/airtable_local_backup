@@ -98,8 +98,10 @@ def test_write_out_backup(tmpdir_factory, filedata, tarfile, tmp_fs):
     back_fs4 = fs.open_fs(str(testdir4))
     file_io._write_out_backup([back_fs1, back_fs2],
                               filepath=tarfile)
-    file_io._write_out_backup([back_fs3, back_fs4],
+    file_io._write_out_backup(back_fs3,
                               filesystem=tmp_fs, prefix='hi/')
+    file_io._write_out_backup(back_fs4,
+                              filesystem=tmp_fs, prefix='hi')
     assert 'stuff.tar' in back_fs1.listdir('/')
     assert 'stuff.tar' in back_fs2.listdir('/')
     back_fs1.close()
@@ -117,3 +119,6 @@ def test_write_out_backup(tmpdir_factory, filedata, tarfile, tmp_fs):
             assert value in testfile
         with back_fs4.open('hi/' + key) as testfile:
             assert value in testfile
+
+    with pytest.raises(AttributeError):
+        file_io._write_out_backup(back_fs1)
