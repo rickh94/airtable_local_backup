@@ -1,3 +1,6 @@
+os:
+  - linux
+  - osx
 language: python
 cache: pip
 python:
@@ -6,6 +9,11 @@ python:
   - "3.6.2"
   - "3.6.3"
   - "3.7-dev"
+
+matrix:
+  allow_failures:
+    - os: osx
+    - python: "3.7-dev"
 
 before_install:
   - pip install codecov
