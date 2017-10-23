@@ -78,5 +78,4 @@ def prepare_records(table_data, *, s3fs=None, check_integrity=True,
                 newdata[key] = urls
             else:
                 newdata[key] = value
-
         yield newdata
