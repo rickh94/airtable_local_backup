@@ -30,6 +30,7 @@ setup(
         'boto3',
         'fs',
         'fs-s3fs',
+        'better_exceptions',
     ],
     tests_require=['pytest', 'pytest-cov'],
     setup_requires=['pytest-runner'],
