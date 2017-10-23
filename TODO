@@ -1,14 +1,12 @@
 make an actual program from the piles of code __IN PROGRESS__
-test with binary attachments __DONE__
-add compression support __DONE__
 create structure for storing various json files (directories and zip file? aws
 prefix, etc.) Need to decide whether one big file handled internally or
-directory of files: __directory of files zipped or tar xz__
+directory of files: __IN PROGRESS__
 figure out a way to deal with linked records
-profile compression of attachments vs compression of final file, vs both
-add native support for s3 and digitalocean for backing store and attachment restore
+add native support for s3 and digitalocean for backing store and attachment restore __IN PROGRESS__
 add multipart uploading
-add yaml config file support
+add yaml config file support and storing of the backup config and information
+with the backup
 expose and document api
 publish to pypi
 
@@ -16,9 +14,8 @@ create cli as part of package or separate
 possible:
 create csv
 scripts for deployment to aws lambda and s3
-api gateway for configuration?
+api gateway for configuration
 add support for writing out to other type of database (e.g. tinydb, mongodb,
 etc) what to do with blobs?
-set lifecycles for temporary files
 
 # vim: se ft=markdown:

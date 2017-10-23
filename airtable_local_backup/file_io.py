@@ -4,51 +4,78 @@ import json
 from pathlib import Path
 import hashlib
 import tempfile
+from fs.copy import copy_fs
+from fs.errors import ResourceNotFound
 
 
-def make_file_name(tablename, prefix, suffix):
+def _make_file_name(tablename, prefix, suffix):
     return prefix + tablename + suffix + '.json'
 
 
-def write_to_file(downloadtable, directory=None, prefix='', suffix=''):
+def _write_to_file(downloadtable, tmpfs, prefix='', suffix=''):
     """
     Write out the table data to a file.
     Arguments:
         downloadtable: A DownloadTable object for the table to be saved
-        directory: the directory in which to save the file
+        filesystem: the temporary filesystem (from pyfilesystem2) to write the
+            file to.
         prefix: A prefix for a the file name
         suffix: the suffix to append to the file name
     """
     data = list(dowloadtable)
-    filename = make_file_name(downloadtable.table_name, prefix, suffix)
-    if directory:
-        os.makedirs(directory, exist_ok=True)
-        path = Path(directory, filename)
-    else:
-        path = Path(filename)
-
-    with open(path, 'w') as outfile:
-        json.dump(data, outfile)
+    filename = _make_file_name(downloadtable.table_name, prefix, suffix)
+    with tmpfs.open(filename, 'w') as outfile:
+        json.dump(data, outfile, indent=2)
 
 
-def put_to_s3(tabledata, bucket, prefix='', suffix='', encryption='AES256',
-              storage_class='STANDARD-IA'):
+def _join_files(tmpfs, outfs):
     """
-    Upload the tabledata as an object to s3.
+    Join the files into a single file (tarball, zip).
     Arguments:
-        downloadtable: A DownloadTable object for the the table to be uploaded
-        bucket: the s3 bucket to upload to
-        prefix: the prefix to add to the object. include / for "folders"
-        suffix: the suffix to append to the filename
+        tmpfs: the temporary fs where the backup is stored.
+        outfs: the filesystem to copy to (should be tarfs or zipfs). things
+            like compression and encoding should be specified at instanciation.
     """
-    data = list(downloadtable)
-    key = make_file_name(downloadtable.table_name, prefix, suffix)
-    s3 = boto3.client('s3')
-    extra_args = {
-        'StorageClass': storage_class,
-        'ServerSideEncryption': encryption
-    }
-    with tempfile.TemporaryFile() as f:
-        json.dump(data, f)
-        f.seek(0)
-        s3.upload_fileobj(f, bucket, key, ExtraArgs=extra_args)
+    copy_fs(tmpfs, outfs)
+
+
+def _write_out_backup(backing_store_fs, *, filepath=None, filesystem=None,
+                      prefix=''):
+    """
+    Write the backup data to its final backing store
+    Arguments:
+        backing_store_fs: a pyfilesystem2 object to be the final storage
+            location of the backup. should be OSFS, S3FS, FTPFS, etc.
+            can be a single object or list of filesystem objects for copying to
+            multiple backing stores.
+        filepath: path to the zip or tar file containing the backup data (if
+            desired). Can be a path object or str
+        filesystem: the tmpfs containing the backup data.
+        prefix: a parent directory for the files to be saved under.
+            This is can be a good place to encode some information about the
+            backup. A slash will be appended to the prefix to create
+            a directory or pseudo-directory structure.
+    """
+    if prefix and not prefix[-1] == '/':
+        prefix = prefix + '/'
+    if not isinstance(backing_store_fs, list):
+        backing_store_fs = [backing_store_fs]
+    if filepath:
+        name = os.path.basename(filepath)
+        for backing_fs in backing_store_fs:
+            # read outfile directly from infile
+            with backing_fs.open(prefix + name, 'w') as outfile:
+                with open(filepath, 'r') as infile:
+                    outfile.write(infile.read())
+    elif filesystem:
+        for backing_fs in backing_store_fs:
+            if prefix:
+                try:
+                    backing_fs.opendir(prefix)
+                except ResourceNotFound:
+                    backing_fs.makedir(prefix)
+                copy_fs(filesystem, backing_fs.opendir(prefix))
+            else:
+                copy_fs(filesystem, backing_fs)
+    else:
+        raise AttributeError("filepath or filesystem is required.")
