@@ -13,6 +13,7 @@ airtable-python-wrapper = "*"
 "boto3" = "*"
 fs = "*"
 "fs-s3fs" = "*"
+ruamel-yaml = "*"
 
 
 [dev-packages]
