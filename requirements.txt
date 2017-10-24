@@ -3,3 +3,4 @@ requests
 fs
 fs-s3fs
 better_exceptions
+ruamel-yaml
