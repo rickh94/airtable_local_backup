@@ -14,5 +14,5 @@ class Runner(object):
         yaml = YAML()
         if not filesystem:
             filesystem = fs.open_fs('/')
-        with filesystem.open(path) as configfile:
+        with filesystem.open(path, 'r') as configfile:
             self.config = yaml.load(configfile)
