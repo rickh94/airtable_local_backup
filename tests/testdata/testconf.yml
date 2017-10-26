@@ -60,6 +60,10 @@ Tables:
       Attachments: Attachment
       Checkbox: Checkbox
       Email: Email
+# How to handle attachments:
+Attachments:
+  Save: embed # allowed options embed, False
+  Compress: True # allowed options: True, False
 # Restore Config (optional). If this is missing automatic restoring will be
 # disabled.
 # where to put attachments when restoring

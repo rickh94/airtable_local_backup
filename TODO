@@ -8,6 +8,7 @@ add multipart uploading
 add yaml config file support and storing of the backup config and information
 with the backup
 expose and document api
+allow discarding of attachments
 publish to pypi
 
 create cli as part of package or separate
