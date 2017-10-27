@@ -18,6 +18,7 @@ def testconf_yml():
 def badconf_yml():
     return os.path.abspath(Path(DATA, 'bad.yml'))
 
+
 @pytest.fixture
 def testrunner(testconf_yml):
     return runner.Runner(path=testconf_yml)
@@ -65,4 +66,3 @@ def test_create_backup_tables(testrunner, table_names, bad_testrunner):
     assert table_names == [], "All tables should have been removed"
     with pytest.raises(ConfigurationError):
         list(bad_testrunner._create_backup_tables())
-
