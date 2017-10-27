@@ -1,0 +1,75 @@
+Base Name: TestDB
+# For any secret keys, It is prefered to specify an environment
+# variable by using a leading $ instead of specifying them in plain
+# text.
+# Backup Config (required)
+Airtable Base Key: app123456
+# It is best to specify the airtable api key in an env variable
+# AIRTABLE_API_KEY. Leave this as none to read from that variable.
+Airtable API Key: null
+# Whether to store as a package or flat files. Available options:
+# tar, zip, files
+# if tar is specified, you may also specify compression as xz, bz2, or gz
+Store As:
+ Type: tar
+ Compression: xz
+# where to put the final backup. Specify a uri as documented at
+# http://pyfilesystem2.readthedocs.io/en/latest/builtin.html for osfs,
+# mountfs, ftpfs. You can use non-native filesystems (e.g. sshfs) but you will
+# need to install the corresponding extensions to pyfilesystem2. Obviously this
+# must be accessible to the backup program when it runs.
+# Backing Store:
+#   - URI: /home/backupuser/backups
+# You may also specify S3 or S3-compat. For s3 or s3 compatible service.
+# It is recommended that you use external authentication for S3 (env vars or
+# IAM roles), but you may specify Key ID and Secret Key, preferably through
+# env vars.
+# Specify Date: True for adding date information to the backup file/folders.
+Backing Store:
+  Type: S3
+  Bucket: mybackupbucket
+  Prefix: backupfolder/
+  Date: True
+# Specify any tables to back up in this section. It is crucial that this be
+# accurate or data will be missed. If tables are added or names are changed,
+# the configuration file must be updated or it will create errors or missed data.
+# You may also specify the fields as Field Name: Field Type. It is not required, but
+# will make recovery much easier.
+Tables:
+  - Name: giant_table
+    Fields:
+      Number: Number
+      UUID: Single line text
+      Attachments: Attachment
+  - Name: Contacts
+    Fields:
+      Last Name: Single line text
+      First Name: Single line text
+      Email Address: Email
+      Phone Number: Phone Number
+  - Name: Random Data
+    Fields:
+      ID: Number
+      Notes: Multi line text
+      Check: Checkbox
+      Attachments: Attachments
+  - Name: Lots of fields
+    Fields:
+      Name: Single line text
+      Notes: Multi line text
+      Attachments: Attachment
+      Checkbox: Checkbox
+      Email: Email
+# How to handle attachments:
+Attachments:
+  Save: embed # allowed options embed, False
+  Compress: True # allowed options: True, False
+# Restore Config (optional). If this is missing automatic restoring will be
+# disabled.
+# where to put attachments when restoring
+Attachment Store:
+  Type: S3-compat
+  Bucket: testairtableattachments
+  Endpoint URL: https://nyc3.digitaloceanspaces.com
+  Key ID: $DOKEY
+  Secret Key: $DOSECRET

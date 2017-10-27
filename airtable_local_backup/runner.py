@@ -3,6 +3,8 @@ import fs
 from fs import tempfs
 from fs_s3fs import S3FS
 
+from .download import DownloadTable
+
 
 class Runner(object):
     def __init__(self, path, *, filesystem=None):
@@ -15,8 +17,15 @@ class Runner(object):
         yaml = YAML()
         if not filesystem:
             filesystem = fs.open_fs('/')
-        with filesystem.open(path) as configfile:
+        with filesystem.open(path, 'r') as configfile:
             self.config = yaml.load(configfile)
         self.tmp = tempfs.TempFS()
 
-    def
+    def _create_backup_tables(self):
+        for table in self.config['Tables']:
+            yield DownloadTable(
+                base_key=self.config['Airtable Base Key'],
+                table_name=table['Name'],
+                api_key=self.config['Airtable API Key'],
+                compression=self.config['Attachments']['Compression']
+            )
