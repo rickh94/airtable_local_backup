@@ -35,10 +35,11 @@ class Runner(object):
                     fields=table.get('Fields', dict()),
                     discard_attach=self.config['Attachments']['Discard'],
                 )
-            except KeyError:
+            except KeyError as err:
                 raise exceptions.ConfigurationError(
                     "Options are missing in the configuration file. "
-                    f"Please consult the docs at {__docurl__}"
+                    f"Please consult the docs at {__docurl__}.\n"
+                    f"{err}"
                 )
 
     def _save_tables(self):
