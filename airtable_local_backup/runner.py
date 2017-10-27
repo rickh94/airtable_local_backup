@@ -4,6 +4,9 @@ from fs import tempfs
 from fs_s3fs import S3FS
 
 from .download import DownloadTable
+from . import file_io
+from . import exceptions
+from . import __docurl__
 
 
 class Runner(object):
@@ -23,9 +26,21 @@ class Runner(object):
 
     def _create_backup_tables(self):
         for table in self.config['Tables']:
-            yield DownloadTable(
-                base_key=self.config['Airtable Base Key'],
-                table_name=table['Name'],
-                api_key=self.config['Airtable API Key'],
-                compression=self.config['Attachments']['Compression']
-            )
+            try:
+                yield DownloadTable(
+                    base_key=self.config['Airtable Base Key'],
+                    table_name=table['Name'],
+                    api_key=self.config['Airtable API Key'],
+                    compression=self.config['Attachments']['Compress'],
+                    fields=table.get('Fields', dict()),
+                    discard_attach=self.config['Attachments']['Discard'],
+                )
+            except KeyError:
+                raise exceptions.ConfigurationError(
+                    "Options are missing in the configuration file. "
+                    f"Please consult the docs at {__docurl__}"
+                )
+
+    def _save_tables(self):
+        for table in self._create_backup_tables():
+            file_io._write_to_file(table, self.tmp)

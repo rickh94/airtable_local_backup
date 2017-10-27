@@ -41,6 +41,8 @@ Tables:
       Number: Number
       UUID: Single line text
       Attachments: Attachment
+    Options:
+      Prefix:
   - Name: Contacts
     Fields:
       Last Name: Single line text
@@ -62,7 +64,7 @@ Tables:
       Email: Email
 # How to handle attachments:
 Attachments:
-  Save: embed # allowed options embed, False
+  Discard: False # if true attachments will be discarded
   Compress: True # allowed options: True, False
 # Restore Config (optional). If this is missing automatic restoring will be
 # disabled.

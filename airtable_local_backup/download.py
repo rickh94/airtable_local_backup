@@ -17,17 +17,23 @@ class DownloadTable(list):
         table_name: the table name to download
         api_key: the airtable api key. If an environment variable
             'AIRTABLE_API_KEY' is set this is not required.
+        compression: whether to compress attachment data
+        fields: Store the field
+        discard_attach: if true, attachment data will not be downloaded, url
+        and other info will be preservered
 
     Returns:
         A generator that will yield all the data in the table.
     """
     # TODO: add optional dict of keys for recording the fields
     def __init__(self, base_key, table_name, api_key=None, progress=False,
-                 compression=True):
+                 compression=True, fields=dict(), discard_attach=False):
         self.base_key = base_key
         self.table_name = table_name
         self.api_key = api_key
         self.compression = compression
+        self.fields = fields
+        self.discard_attach = discard_attach
 
     def download_table(self):
         table = airtable.Airtable(base_key=self.base_key,
@@ -39,9 +45,10 @@ class DownloadTable(list):
             # newrecords.append(extract_record(record))
             newdata = {}
             for key, value in record['fields'].items():
-                # if key not in keys:
-                #     keys.append(key)
-                if list(common._findkeys(value, 'url')):
+                if key not in self.fields:
+                    self.fields[key] = 'Unknown'
+                if list(common._findkeys(value, 'url')) \
+                        and not self.discard_attach:
                     filedata = []
                     for item in value:
                         fileinfo = _get_attach(item['filename'],
