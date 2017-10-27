@@ -1,5 +1,6 @@
 from ruamel.yaml import YAML
 import fs
+from fs import tempfs
 from fs_s3fs import S3FS
 
 
@@ -16,3 +17,6 @@ class Runner(object):
             filesystem = fs.open_fs('/')
         with filesystem.open(path) as configfile:
             self.config = yaml.load(configfile)
+        self.tmp = tempfs.TempFS()
+
+    def
