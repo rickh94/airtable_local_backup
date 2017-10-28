@@ -8,11 +8,13 @@ Airtable Base Key: app123456
 # AIRTABLE_API_KEY. Leave this as none to read from that variable.
 Airtable API Key: null
 # Whether to store as a package or flat files. Available options:
-# tar, zip, files
+# tar, zip, files,
 # if tar is specified, you may also specify compression as xz, bz2, or gz
+# if it is not flat files, specify a filename to save the zip or tar under.
 Store As:
  Type: tar
  Compression: xz
+ Path: /tmp/testbackup.tar.xz
 # where to put the final backup. Specify a uri as documented at
 # http://pyfilesystem2.readthedocs.io/en/latest/builtin.html for osfs,
 # mountfs, ftpfs. You can use non-native filesystems (e.g. sshfs) but you will

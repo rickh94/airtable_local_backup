@@ -1,12 +1,17 @@
 from ruamel.yaml import YAML
 import fs
 from fs import tempfs
+from fs import tarfs
+from fs import zipfs
 from fs_s3fs import S3FS
 
 from .download import DownloadTable
 from . import file_io
 from . import exceptions
 from . import __docurl__
+
+
+ERRMESS = ()
 
 
 class Runner(object):
@@ -39,9 +44,38 @@ class Runner(object):
                 raise exceptions.ConfigurationError(
                     "Options are missing in the configuration file. "
                     f"Please consult the docs at {__docurl__}.\n"
-                    f"{err}"
-                )
+                    f"{err}")
 
     def _save_tables(self):
         for table in self._create_backup_tables():
-            file_io._write_to_file(table, self.tmp)
+            file_io.write_to_file(table, self.tmp)
+
+    def _package(self, outfile):
+        if self.config['Store As']['Type'].lower() == 'tar':
+            savefs = tarfs.TarFS(outfile,
+                                 write=True,
+                                 compression=self.config['Store As']['Compression']
+                                 )
+        elif self.config['Store As']['Type'].lower() == 'zip':
+            savefs = zipfs.ZipFS(outfile)
+        file_io.join_files(self.tmp, savefs)
+
+    def backup(self):
+        """
+        Using the configuration from the file, create the backup.
+        :return: None
+        """
+        _save_tables()
+        try:
+            if self.config['Store As']['Type'] != 'files':
+                outfile = self.config['Store As']['Path']
+                _package(outfile)
+            else:
+                outfile = None
+        except KeyError as err:
+            raise exceptions.ConfigurationError(
+                "Options are missing in the configuration file. "
+                f"Please consult the docs at {__docurl__}.\n"
+                f"{err}")
+        # TODO: write out backup
+

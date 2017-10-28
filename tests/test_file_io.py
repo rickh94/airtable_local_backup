@@ -43,7 +43,7 @@ def test_write_to_file(filedata, lots_of_fields_raw, monkeypatch, tmpdir):
     table = download.DownloadTable(base_key='app12345', api_key='key12345',
                                    table_name='lots of fields')
     test_tmpfs = fs.open_fs(str(tmpdir))
-    file_io._write_to_file(table, tmpfs=test_tmpfs, prefix='prefix/',
+    file_io.write_to_file(table, tmpfs=test_tmpfs, prefix='prefix/',
                            suffix='-hi')
     assert 'lots_of_fields-hi.json' in os.listdir(tmpdir + '/prefix')
     with open(tmpdir + '/prefix/lots_of_fields-hi.json', 'r') as datafile:
@@ -66,15 +66,17 @@ def tmp_fs(tmpdir_factory, filedata):
     return test_tmpfs
 
 
-def test_join_files(tmpdir, filedata, tmp_fs):
-    test_outfs = tarfs.TarFS(str(Path(tmpdir, 'testtar.tar.xz')),
+def test_join_files(tmpdir, filedata, tmp_fs, monkeypatch):
+    outfile = Path(tmpdir, 'testtar.tar.xz')
+    test_outfs = tarfs.TarFS(str(outfile),
                              compression='xz', write=True)
-    file_io._join_files(tmp_fs, test_outfs)
+    file_io.join_files(tmp_fs, test_outfs)
+    test_readout = tarfs.TarFS(str(outfile))
     for key, value in filedata.items():
-        assert key in test_outfs.listdir('/')
-        with test_outfs.open(key, 'r') as outfile:
+        assert key in test_readout.listdir('/')
+        with test_readout.open(key, 'r') as outfile:
             assert value in outfile.read()
-    test_outfs.close()
+    test_readout.close()
 
 
 @pytest.fixture
@@ -98,13 +100,13 @@ def test_write_out_backup(tmpdir_factory, filedata, tarfile, tmp_fs):
     back_fs3 = fs.open_fs(str(testdir3))
     back_fs4 = fs.open_fs(str(testdir4))
     back_fs5 = fs.open_fs(str(testdir5))
-    file_io._write_out_backup([back_fs1, back_fs2],
+    file_io.write_out_backup([back_fs1, back_fs2],
                               filepath=tarfile)
-    file_io._write_out_backup(back_fs3,
+    file_io.write_out_backup(back_fs3,
                               filesystem=tmp_fs, prefix='hi/')
-    file_io._write_out_backup(back_fs4,
+    file_io.write_out_backup(back_fs4,
                               filesystem=tmp_fs, prefix='hi')
-    file_io._write_out_backup(back_fs5,
+    file_io.write_out_backup(back_fs5,
                               filesystem=tmp_fs)
     assert 'stuff.tar' in back_fs1.listdir('/')
     assert 'stuff.tar' in back_fs2.listdir('/')
@@ -128,4 +130,4 @@ def test_write_out_backup(tmpdir_factory, filedata, tarfile, tmp_fs):
             assert value in testfile
 
     with pytest.raises(AttributeError):
-        file_io._write_out_backup(back_fs1)
+        file_io.write_out_backup(back_fs1)

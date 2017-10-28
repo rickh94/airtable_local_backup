@@ -1,10 +1,6 @@
 import os
-import boto3
 import json
 import re
-from pathlib import Path
-import hashlib
-import tempfile
 from fs.copy import copy_fs
 from fs.errors import ResourceNotFound
 
@@ -21,7 +17,7 @@ def _make_file_name(tablename, prefix, suffix):
     return prefix + _normalize(tablename) + suffix + '.json'
 
 
-def _write_to_file(downloadtable, tmpfs, prefix='', suffix='', fields=dict()):
+def write_to_file(downloadtable, tmpfs, prefix='', suffix='', fields=dict()):
     """
     Write out the table data to a file.
     Arguments:
@@ -45,7 +41,7 @@ def _write_to_file(downloadtable, tmpfs, prefix='', suffix='', fields=dict()):
         json.dump(tagged_data, outfile, indent=2)
 
 
-def _join_files(tmpfs, outfs):
+def join_files(tmpfs, outfs):
     """
     Join the files into a single file (tarball, zip).
     Arguments:
@@ -54,9 +50,10 @@ def _join_files(tmpfs, outfs):
             like compression and encoding should be specified at instanciation.
     """
     copy_fs(tmpfs, outfs)
+    outfs.close()
 
 
-def _write_out_backup(backing_store_fs, *, filepath=None, filesystem=None,
+def write_out_backup(backing_store_fs, *, filepath=None, filesystem=None,
                       prefix=''):
     """
     Write the backup data to its final backing store
