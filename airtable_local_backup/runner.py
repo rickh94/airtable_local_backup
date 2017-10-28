@@ -3,7 +3,7 @@ import fs
 from fs import tempfs
 from fs import tarfs
 from fs import zipfs
-from fs_s3fs import S3FS
+# from fs_s3fs import S3FS
 
 from .download import DownloadTable
 from . import file_io
@@ -58,6 +58,11 @@ class Runner(object):
                                  )
         elif self.config['Store As']['Type'].lower() == 'zip':
             savefs = zipfs.ZipFS(outfile)
+        else:
+            raise exceptions.ConfigurationError(
+                "Options are missing in the configuration file. "
+                f"Please consult the docs at {__docurl__}.\n"
+                f"Store As: Type is invalid")
         file_io.join_files(self.tmp, savefs)
 
     def backup(self):
@@ -65,11 +70,11 @@ class Runner(object):
         Using the configuration from the file, create the backup.
         :return: None
         """
-        _save_tables()
+        self._save_tables()
         try:
             if self.config['Store As']['Type'] != 'files':
                 outfile = self.config['Store As']['Path']
-                _package(outfile)
+                self._package(outfile)
             else:
                 outfile = None
         except KeyError as err:
@@ -78,4 +83,3 @@ class Runner(object):
                 f"Please consult the docs at {__docurl__}.\n"
                 f"{err}")
         # TODO: write out backup
-
