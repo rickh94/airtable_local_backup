@@ -8,6 +8,13 @@ Airtable Local Backup - IN PROGRESS
   :target: https://codecov.io/gh/rickh94/airtable_local_backup
 
 
+.. image:: https://codebeat.co/badges/875ffd7a-5a0f-4ca2-89d2-a8e7037fff80
+  :target: https://codebeat.co/projects/github-com-rickh94-airtable_local_backup-master
+
+
+.. image:: https://img.shields.io/badge/python-3.6-blue.svg
+
+
 The goal of this project is to provide an easy way to backup data from
 Airtable without too much user intervention. (The current recommended
 solution is download individual csv files and attachments and correlate them
