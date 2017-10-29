@@ -1,9 +1,12 @@
+import datetime
+
 from ruamel.yaml import YAML
 import fs
 from fs import tempfs
 from fs import tarfs
 from fs import zipfs
-# from fs_s3fs import S3FS
+from fs.errors import CreateFailed
+from fs_s3fs import S3FS
 
 from .download import DownloadTable
 from . import file_io
@@ -11,17 +14,18 @@ from . import exceptions
 from . import __docurl__
 
 
-ERRMESS = ()
-
-
 class Runner(object):
+    """
+    This class handles orchestration of downloading and storing the backup.
+    Options are set in a yaml configuration file. There is an example at
+    {__docurl__}.
+
+    :param path: (required) absolute path to the file on the system or relative to
+        the FS object supplied in the filesystem parameter
+    :param filesystem: (keyword only) a pyfilesystem2 FS object where the yaml config
+        file is located.
+    """
     def __init__(self, path, *, filesystem=None):
-        """
-        Pass in a path to get a config file. If the configuration is outside
-        the local filesystem, pass in a pyfilesystem2 object to get the
-        file from.
-        Paths should be absolute.
-        """
         yaml = YAML()
         if not filesystem:
             filesystem = fs.open_fs('/')
@@ -41,10 +45,7 @@ class Runner(object):
                     discard_attach=self.config['Attachments']['Discard'],
                 )
             except KeyError as err:
-                raise exceptions.ConfigurationError(
-                    "Options are missing in the configuration file. "
-                    f"Please consult the docs at {__docurl__}.\n"
-                    f"{err}")
+                _config_error(err)
 
     def _save_tables(self):
         for table in self._create_backup_tables():
@@ -59,10 +60,7 @@ class Runner(object):
         elif self.config['Store As']['Type'].lower() == 'zip':
             savefs = zipfs.ZipFS(outfile)
         else:
-            raise exceptions.ConfigurationError(
-                "Options are missing in the configuration file. "
-                f"Please consult the docs at {__docurl__}.\n"
-                f"Store As: Type is invalid")
+            _config_error("Store AS: Type is invalid")
         file_io.join_files(self.tmp, savefs)
 
     def backup(self):
@@ -71,15 +69,54 @@ class Runner(object):
         :return: None
         """
         self._save_tables()
+        outfile = None
         try:
             if self.config['Store As']['Type'] != 'files':
                 outfile = self.config['Store As']['Path']
                 self._package(outfile)
-            else:
-                outfile = None
         except KeyError as err:
-            raise exceptions.ConfigurationError(
-                "Options are missing in the configuration file. "
-                f"Please consult the docs at {__docurl__}.\n"
-                f"{err}")
-        # TODO: write out backup
+            _config_error(err)
+        try:
+            outfs = self._configure_backing_store()
+            prefix = self.config['Backing Store'].get('Prefix', '')
+            if self.config['Backing Store'].get('Date', False):
+                date = datetime.datetime.today().isoformat()
+                prefix = date + '-' + prefix
+        except KeyError as err:
+            _config_error(err)
+        if outfile:
+            file_io.write_out_backup(
+                backing_store_fs=outfs,
+                filepath=outfile,
+                prefix=prefix,
+            )
+        else:
+            file_io.write_out_backup(
+                backing_store_fs=outfs,
+                filesystem=self.tmp,
+                prefix=prefix
+            )
+
+    def _configure_backing_store(self):
+        try:
+            bs =  self.config['Backing Store']
+            if 'Type' in bs:
+                if bs['Type'].lower() == 's3':
+                    return S3FS(
+                        bs['Bucket'],
+                        srict=False,
+                        aws_access_key_id=bs.get('Key ID', None),
+                        aws_secret_access_key=bs.get('Secret Key', None),
+                        endpoint_url=bs.get('Endpoint URL', None)
+                    )
+            else:
+                return fs.open_fs(bs['URI'], create=True)
+        except (KeyError, OSError, CreateFailed) as err:
+            _config_error(err)
+
+
+def _config_error(err=''):
+    raise exceptions.ConfigurationError(
+        "Options are missing in the configuration file. "
+        f"Please consult the docs at {__docurl__}.\n"
+        f"{err}")

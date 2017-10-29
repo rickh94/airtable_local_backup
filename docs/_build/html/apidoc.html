@@ -1,0 +1,182 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Api Documentation &#8212; Airtable Local Backup 0.1a0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1a0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Configuration and Usage" href="usage.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="api-documentation">
+<h1>Api Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This section contains more granular documentation of the classes and
+functions available to the api.</p>
+<dl class="class">
+<dt id="airtable_local_backup.runner.Runner">
+<em class="property">class </em><code class="descclassname">airtable_local_backup.runner.</code><code class="descname">Runner</code><span class="sig-paren">(</span><em>path</em>, <em>*</em>, <em>filesystem=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/runner.html#Runner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.runner.Runner" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class handles orchestration of downloading and storing the backup.
+Options are set in a yaml configuration file. There is an example at
+{__docurl__}.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> – (required) absolute path to the file on the system or relative to
+the FS object supplied in the filesystem parameter</li>
+<li><strong>filesystem</strong> – (keyword only) a pyfilesystem2 FS object where the yaml config
+file is located.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-airtable_local_backup.file_io"></span><dl class="function">
+<dt id="airtable_local_backup.file_io.join_files">
+<code class="descclassname">airtable_local_backup.file_io.</code><code class="descname">join_files</code><span class="sig-paren">(</span><em>tmpfs</em>, <em>outfs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/file_io.html#join_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.file_io.join_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join the backup json files into a single package (tarball, zip).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tmpfs</strong> – the temporary fs where the backup is stored.</li>
+<li><strong>outfs</strong> – the filesystem to copy to (should be <cite>TarFS</cite> or <cite>ZipFS</cite>). things
+like compression and encoding should be specified at instantiation.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="airtable_local_backup.file_io.write_out_backup">
+<code class="descclassname">airtable_local_backup.file_io.</code><code class="descname">write_out_backup</code><span class="sig-paren">(</span><em>backing_store_fs</em>, <em>*</em>, <em>filepath=None</em>, <em>filesystem=None</em>, <em>prefix=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/file_io.html#write_out_backup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.file_io.write_out_backup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the backup data to its final location. A backing store is required
+and either a filepath to the packaged backup or the tmp filesystem is required.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>list</strong><strong>,</strong><strong>FS backing_store_fs</strong> (<em>required</em>) – a pyfilesystem2 object to be the final storage
+location of the backup. (should be <cite>OSFS</cite>, <cite>S3FS</cite>, <cite>FTPFS</cite>, etc.)
+Can be a single object or list of filesystem objects for copying to
+multiple backing stores.</li>
+<li><strong>filepath</strong> – path to the zip or tar file containing the backup data (if
+desired). Can be a path object or str.</li>
+<li><strong>filesystem</strong> – the <cite>TmpFS</cite> containing the backup data.</li>
+<li><strong>prefix</strong> – a parent directory for the files to be saved under.
+This is can be a good place to encode some information about the
+backup. A slash will be appended to the prefix to create
+a directory or pseudo-directory structure.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="airtable_local_backup.file_io.write_to_file">
+<code class="descclassname">airtable_local_backup.file_io.</code><code class="descname">write_to_file</code><span class="sig-paren">(</span><em>downloadtable</em>, <em>tmpfs</em>, <em>prefix=''</em>, <em>suffix=''</em>, <em>fields={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/file_io.html#write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.file_io.write_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write out the table data to a file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>downloadtable</strong> – A <cite>download.DownloadTable</cite> object for the table to be saved</li>
+<li><strong>tmpfs</strong> – the temporary filesystem (from pyfilesystem2) to write the
+file to.</li>
+<li><strong>prefix</strong> – A prefix for a the file name. include a / for directories</li>
+<li><strong>suffix</strong> – A suffix to append to the file name</li>
+<li><strong>fields</strong> – a dict of the fields and type of data in the field for easier restoring.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="usage.html" title="previous chapter">Configuration and Usage</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Rick Henry.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/apidoc.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

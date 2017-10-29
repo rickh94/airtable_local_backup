@@ -21,11 +21,12 @@ Store As:
 # need to install the corresponding extensions to pyfilesystem2. Obviously this
 # must be accessible to the backup program when it runs.
 # Backing Store:
-#   - URI: /home/backupuser/backups
-# You may also specify S3 or S3-compat. For s3 or s3 compatible service.
+#   URI: /home/backupuser/backups
+# You may also specify S3 for s3 or s3 compatible service.
 # It is recommended that you use external authentication for S3 (env vars or
 # IAM roles), but you may specify Key ID and Secret Key, preferably through
 # env vars.
+# Be sure to specify Endpoint URL and ensure authentication for S3 compatible services
 # Specify Date: True for adding date information to the backup file/folders.
 Backing Store:
   Type: S3
@@ -72,7 +73,7 @@ Attachments:
 # disabled.
 # where to put attachments when restoring
 Attachment Store:
-  Type: S3-compat
+  Type: S3
   Bucket: testairtableattachments
   Endpoint URL: https://nyc3.digitaloceanspaces.com
   Key ID: $DOKEY
