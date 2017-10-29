@@ -28,7 +28,7 @@ Internals
 Airtable does not offer an quick offline backup solution, but they do offer
 and decent REST API so that is what is used to download the table data.
 Listing tables is not supported so they will need to be specified in a config
-(yaml) file. Attachmented files are downloaded, their data compressed
+(yaml) file. Attachment files are downloaded, their data compressed
 (optional), and base64 encoded and stored with their filename and a hash fo
 the original data. The whole table is then serialized to json and dumped to a
 file. *incomplete*
