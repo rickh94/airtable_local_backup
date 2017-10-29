@@ -47,7 +47,7 @@ def test_config(testrunner):
     assert testrunner.config['Tables'][0]['Name'] == 'giant_table'
     assert testrunner.config['Tables'][1]['Fields']['Last Name'] ==\
         'Single line text'
-    assert testrunner.config['Attachment Store']['Type'] == 'S3-compat'
+    assert testrunner.config['Attachment Store']['Type'] == 'S3'
     assert testrunner.config['Attachment Store']['Bucket'] ==\
         'testairtableattachments'
     assert testrunner.config['Attachment Store']['Key ID'][0] == '$'
