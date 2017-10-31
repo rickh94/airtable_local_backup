@@ -9,7 +9,7 @@ def _normalize(name):
     """Clean up the names."""
     if name is None:
         return None
-    clean = re.sub(r'[-_\s]+', '_', name.strip())
+    clean = re.sub(r'[-_/\s]+', '_', name.strip())
     return clean.lower()
 
 
@@ -28,7 +28,7 @@ def write_to_file(downloadtable, tmpfs, prefix='', suffix='', fields=dict()):
     :param suffix: A suffix to append to the file name
     :param fields: a dict of the fields and type of data in the field for easier restoring.
     """
-    data = list(downloadtable.download_table())
+    data = list(downloadtable.download())
     filename = _make_file_name(downloadtable.table_name, prefix, suffix)
     if '/' in prefix:
         tmpfs.makedir(prefix)
@@ -59,7 +59,7 @@ def write_out_backup(backing_store_fs, *, filepath=None, filesystem=None,
     Write the backup data to its final location. A backing store is required
     and either a filepath to the packaged backup or the tmp filesystem is required.
 
-    :param required list,FS backing_store_fs: a pyfilesystem2 object to be the final storage
+    :param required backing_store_fs: a pyfilesystem2 object to be the final storage
             location of the backup. (should be `OSFS`, `S3FS`, `FTPFS`, etc.)
             Can be a single object or list of filesystem objects for copying to
             multiple backing stores.

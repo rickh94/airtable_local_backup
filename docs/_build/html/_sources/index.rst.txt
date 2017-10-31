@@ -11,7 +11,7 @@ Introduction
 ============
 
 Airtable Local Backup provides a (somewhat) user friendly way to backup data
-from [Airtable](http://airtable.com) locally. There are a number of useful
+from `Airtable <http://airtable.com>`_ locally. There are a number of useful
 functions to generate your own custom backup scripts or you can use the
 provided ``Runner`` class and a yaml-style configuration file **ADD EXAMPLE**
 to orchestrate the backup.

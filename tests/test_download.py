@@ -25,7 +25,7 @@ def test_download_table(lots_of_fields_raw, lots_of_fields_hashes,
     monkeypatch.setenv('AIRTABLE_API_KEY', '')
     table = download.DownloadTable(base_key='app12345', api_key='key12345',
                                    table_name='lots of fields')
-    for item in table.download_table():
+    for item in table.download():
         assert item in lots_of_fields_correct
         filename = item['Attachments'][0]['filename']
         assert item['Attachments'][0]['md5hash'] ==\

@@ -50,7 +50,7 @@
     <span class="sd">&quot;&quot;&quot;Clean up the names.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
-    <span class="n">clean</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[-_\s]+&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+    <span class="n">clean</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[-_/\s]+&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">clean</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
 
@@ -69,7 +69,7 @@
 <span class="sd">    :param suffix: A suffix to append to the file name</span>
 <span class="sd">    :param fields: a dict of the fields and type of data in the field for easier restoring.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">downloadtable</span><span class="o">.</span><span class="n">download_table</span><span class="p">())</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">downloadtable</span><span class="o">.</span><span class="n">download</span><span class="p">())</span>
     <span class="n">filename</span> <span class="o">=</span> <span class="n">_make_file_name</span><span class="p">(</span><span class="n">downloadtable</span><span class="o">.</span><span class="n">table_name</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
     <span class="k">if</span> <span class="s1">&#39;/&#39;</span> <span class="ow">in</span> <span class="n">prefix</span><span class="p">:</span>
         <span class="n">tmpfs</span><span class="o">.</span><span class="n">makedir</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
@@ -100,7 +100,7 @@
 <span class="sd">    Write the backup data to its final location. A backing store is required</span>
 <span class="sd">    and either a filepath to the packaged backup or the tmp filesystem is required.</span>
 
-<span class="sd">    :param required list,FS backing_store_fs: a pyfilesystem2 object to be the final storage</span>
+<span class="sd">    :param required backing_store_fs: a pyfilesystem2 object to be the final storage</span>
 <span class="sd">            location of the backup. (should be `OSFS`, `S3FS`, `FTPFS`, etc.)</span>
 <span class="sd">            Can be a single object or list of filesystem objects for copying to</span>
 <span class="sd">            multiple backing stores.</span>

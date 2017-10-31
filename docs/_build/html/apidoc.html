@@ -43,12 +43,15 @@
 <h1>Api Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
 <p>This section contains more granular documentation of the classes and
 functions available to the api.</p>
+<div class="section" id="automated-runner">
+<h2>Automated Runner<a class="headerlink" href="#automated-runner" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="airtable_local_backup.runner.Runner">
 <em class="property">class </em><code class="descclassname">airtable_local_backup.runner.</code><code class="descname">Runner</code><span class="sig-paren">(</span><em>path</em>, <em>*</em>, <em>filesystem=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/runner.html#Runner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.runner.Runner" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class handles orchestration of downloading and storing the backup.
-Options are set in a yaml configuration file. There is an example at
-{__docurl__}.</p>
+Options are set in a yaml configuration file. There is an
+<a class="reference download internal" href="_downloads/sample-config.yaml" download=""><code class="xref download docutils literal"><span class="pre">example</span></code></a> you can use as a
+starting point.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -65,7 +68,54 @@ file is located.</li>
 </table>
 </dd></dl>
 
-<span class="target" id="module-airtable_local_backup.file_io"></span><dl class="function">
+</div>
+<div class="section" id="useful-methods-classes">
+<h2>Useful Methods/Classes<a class="headerlink" href="#useful-methods-classes" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="download-table">
+<h3>Download Table<a class="headerlink" href="#download-table" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="airtable_local_backup.download.DownloadTable">
+<em class="property">class </em><code class="descclassname">airtable_local_backup.download.</code><code class="descname">DownloadTable</code><span class="sig-paren">(</span><em>base_key</em>, <em>table_name</em>, <em>api_key=None</em>, <em>progress=False</em>, <em>compression=True</em>, <em>fields={}</em>, <em>discard_attach=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/download.html#DownloadTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.download.DownloadTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads all data from a table including atachments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>base_key</strong> – base id from airtable api url (starts ‘app’)</li>
+<li><strong>table_name</strong> – the table name to download</li>
+<li><strong>api_key</strong> – the airtable api key. If an environment variable
+‘AIRTABLE_API_KEY’ is set this is not required.</li>
+<li><strong>compression</strong> – whether to compress attachment data</li>
+<li><strong>fields</strong> – Store the field</li>
+<li><strong>discard_attach</strong> – if true, attachment data will not be downloaded, url
+and other info will be preservered</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="airtable_local_backup.download.DownloadTable.download">
+<code class="descname">download</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/download.html#DownloadTable.download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.download.DownloadTable.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download the data in the table.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A generator that will download each item in the table as it is
+iterated based on the options configured.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-airtable_local_backup.file_io">
+<span id="file-i-o"></span><h3>File I/O<a class="headerlink" href="#module-airtable_local_backup.file_io" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
 <dt id="airtable_local_backup.file_io.join_files">
 <code class="descclassname">airtable_local_backup.file_io.</code><code class="descname">join_files</code><span class="sig-paren">(</span><em>tmpfs</em>, <em>outfs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/file_io.html#join_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.file_io.join_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Join the backup json files into a single package (tarball, zip).</p>
@@ -94,7 +144,7 @@ and either a filepath to the packaged backup or the tmp filesystem is required.<
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>list</strong><strong>,</strong><strong>FS backing_store_fs</strong> (<em>required</em>) – a pyfilesystem2 object to be the final storage
+<li><strong>backing_store_fs</strong> (<em>required</em>) – a pyfilesystem2 object to be the final storage
 location of the backup. (should be <cite>OSFS</cite>, <cite>S3FS</cite>, <cite>FTPFS</cite>, etc.)
 Can be a single object or list of filesystem objects for copying to
 multiple backing stores.</li>
@@ -134,6 +184,8 @@ file to.</li>
 </table>
 </dd></dl>
 
+</div>
+</div>
 </div>
 
 

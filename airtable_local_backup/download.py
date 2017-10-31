@@ -8,24 +8,20 @@ from airtable_local_backup import common
 
 
 # change this to inherit from the airtable.Airtable object
-class DownloadTable(list):
+class DownloadTable(object):
     """
     Downloads all data from a table including atachments.
 
-    Arguments:
-        base_key: base id from airtable api url (starts 'app')
-        table_name: the table name to download
-        api_key: the airtable api key. If an environment variable
+    :param base_key: base id from airtable api url (starts 'app')
+    :param table_name: the table name to download
+    :param api_key: the airtable api key. If an environment variable
             'AIRTABLE_API_KEY' is set this is not required.
-        compression: whether to compress attachment data
-        fields: Store the field
-        discard_attach: if true, attachment data will not be downloaded, url
-        and other info will be preservered
 
-    Returns:
-        A generator that will yield all the data in the table.
+    :param compression: whether to compress attachment data
+    :param fields: Store the field
+    :param discard_attach: if true, attachment data will not be downloaded, url
+        and other info will be preservered
     """
-    # TODO: add optional dict of keys for recording the fields
     def __init__(self, base_key, table_name, api_key=None, progress=False,
                  compression=True, fields=dict(), discard_attach=False):
         self.base_key = base_key
@@ -35,7 +31,13 @@ class DownloadTable(list):
         self.fields = fields
         self.discard_attach = discard_attach
 
-    def download_table(self):
+    def download(self):
+        """
+        Download the data in the table.
+
+        :return: A generator that will download each item in the table as it is
+              iterated based on the options configured.
+        """
         table = airtable.Airtable(base_key=self.base_key,
                                   api_key=self.api_key,
                                   table_name=self.table_name)
@@ -59,7 +61,6 @@ class DownloadTable(list):
                 else:
                     newdata[key] = value
             yield newdata
-        # self.data = list of all the parsed records.
 
 
 def _get_attach(filename, url, compression):

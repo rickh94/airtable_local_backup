@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from ruamel.yaml import YAML
 import fs
@@ -17,8 +18,9 @@ from . import __docurl__
 class Runner(object):
     """
     This class handles orchestration of downloading and storing the backup.
-    Options are set in a yaml configuration file. There is an example at
-    {__docurl__}.
+    Options are set in a yaml configuration file. There is an
+    :download:`example <./sample-config.yaml>` you can use as a
+    starting point.
 
     :param path: (required) absolute path to the file on the system or relative to
         the FS object supplied in the filesystem parameter
@@ -36,10 +38,12 @@ class Runner(object):
     def _create_backup_tables(self):
         for table in self.config['Tables']:
             try:
+                base = _get_from_env(self.config['Airtable Base Key'])
+                api_key = _get_from_env(self.config['Airtable API Key'])
                 yield DownloadTable(
-                    base_key=self.config['Airtable Base Key'],
+                    base_key=base,
                     table_name=table['Name'],
-                    api_key=self.config['Airtable API Key'],
+                    api_key=api_key,
                     compression=self.config['Attachments']['Compress'],
                     fields=table.get('Fields', dict()),
                     discard_attach=self.config['Attachments']['Discard'],
@@ -99,8 +103,10 @@ class Runner(object):
 
     def _configure_backing_store(self):
         try:
-            bs =  self.config['Backing Store']
+            bs = self.config['Backing Store']
             if 'Type' in bs:
+                for key, item in bs.items():
+                    bs[key] = _get_from_env(item)
                 if bs['Type'].lower() == 's3':
                     return S3FS(
                         bs['Bucket'],
@@ -120,3 +126,13 @@ def _config_error(err=''):
         "Options are missing in the configuration file. "
         f"Please consult the docs at {__docurl__}.\n"
         f"{err}")
+
+def _get_from_env(item):
+    if item is None:
+        return None
+    try:
+        if item[0] == '$':
+            return os.environ[item[1:]]
+    except TypeError:
+        pass
+    return item

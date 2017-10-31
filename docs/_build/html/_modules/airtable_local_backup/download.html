@@ -1,0 +1,163 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>airtable_local_backup.download &#8212; Airtable Local Backup 0.1a0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1a0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for airtable_local_backup.download</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Functions for downloading items from airtable.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">lzma</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">md5</span>
+<span class="kn">import</span> <span class="nn">airtable</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">airtable_local_backup</span> <span class="k">import</span> <span class="n">common</span>
+
+
+<span class="c1"># change this to inherit from the airtable.Airtable object</span>
+<div class="viewcode-block" id="DownloadTable"><a class="viewcode-back" href="../../apidoc.html#airtable_local_backup.download.DownloadTable">[docs]</a><span class="k">class</span> <span class="nc">DownloadTable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads all data from a table including atachments.</span>
+
+<span class="sd">    :param base_key: base id from airtable api url (starts &#39;app&#39;)</span>
+<span class="sd">    :param table_name: the table name to download</span>
+<span class="sd">    :param api_key: the airtable api key. If an environment variable</span>
+<span class="sd">            &#39;AIRTABLE_API_KEY&#39; is set this is not required.</span>
+
+<span class="sd">    :param compression: whether to compress attachment data</span>
+<span class="sd">    :param fields: Store the field</span>
+<span class="sd">    :param discard_attach: if true, attachment data will not be downloaded, url</span>
+<span class="sd">        and other info will be preservered</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_key</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">compression</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="nb">dict</span><span class="p">(),</span> <span class="n">discard_attach</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_key</span> <span class="o">=</span> <span class="n">base_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_name</span> <span class="o">=</span> <span class="n">table_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">api_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compression</span> <span class="o">=</span> <span class="n">compression</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="n">fields</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">discard_attach</span> <span class="o">=</span> <span class="n">discard_attach</span>
+
+<div class="viewcode-block" id="DownloadTable.download"><a class="viewcode-back" href="../../apidoc.html#airtable_local_backup.download.DownloadTable.download">[docs]</a>    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Download the data in the table.</span>
+
+<span class="sd">        :return: A generator that will download each item in the table as it is</span>
+<span class="sd">              iterated based on the options configured.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">airtable</span><span class="o">.</span><span class="n">Airtable</span><span class="p">(</span><span class="n">base_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">base_key</span><span class="p">,</span>
+                                  <span class="n">api_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">api_key</span><span class="p">,</span>
+                                  <span class="n">table_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="n">table_data</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">get_all</span><span class="p">()</span>
+        <span class="c1"># possibly discretize loop into its own function</span>
+        <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">table_data</span><span class="p">:</span>
+            <span class="c1"># newrecords.append(extract_record(record))</span>
+            <span class="n">newdata</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">record</span><span class="p">[</span><span class="s1">&#39;fields&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Unknown&#39;</span>
+                <span class="k">if</span> <span class="nb">list</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">_findkeys</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;url&#39;</span><span class="p">))</span> \
+                        <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">discard_attach</span><span class="p">:</span>
+                    <span class="n">filedata</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="n">fileinfo</span> <span class="o">=</span> <span class="n">_get_attach</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">],</span>
+                                               <span class="n">item</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">],</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">compression</span><span class="p">)</span>
+                        <span class="n">filedata</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fileinfo</span><span class="p">)</span>
+                    <span class="n">newdata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">filedata</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">newdata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">yield</span> <span class="n">newdata</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">_get_attach</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">compression</span><span class="p">):</span>
+    <span class="n">download</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="n">filehash</span> <span class="o">=</span> <span class="n">md5</span><span class="p">(</span><span class="n">download</span><span class="o">.</span><span class="n">content</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">compression</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">lzma</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">download</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">download</span><span class="o">.</span><span class="n">content</span>
+    <span class="n">encoded</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span>
+        <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">encoded</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;compressed&#39;</span><span class="p">:</span> <span class="n">compression</span><span class="p">,</span>
+        <span class="s1">&#39;md5hash&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">filehash</span><span class="p">)</span>
+    <span class="p">}</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Rick Henry.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

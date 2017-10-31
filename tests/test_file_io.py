@@ -25,6 +25,8 @@ def test_make_file_name():
         'prefix/table.json'
     assert file_io._make_file_name('My-test table', 'prefix/', '-2') ==\
         'prefix/my_test_table-2.json'
+    assert file_io._make_file_name('Things/Stuff', 'there/', 'now') ==\
+        'there/things_stuffnow.json'
 
 
 def test_write_to_file(filedata, lots_of_fields_raw, monkeypatch, tmpdir):

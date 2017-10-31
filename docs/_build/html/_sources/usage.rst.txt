@@ -2,12 +2,16 @@
 Configuration and Usage
 =======================
 
-A great starting point is the `example configuration
-file <https://github.com/rickh94/airtable_local_backup/sample-config.yaml>`_.
+---------------
+Getting Started
+---------------
+A great starting point is the :download:`example configuration
+file <./sample-config.yaml>`.
 
-You will also need:
+What You'll Need
+================
  * Your Airtable base key (If you go to the api documentation for your base,
-   it's in the url https://api.airtable.com/v0/YOUR_BASE_KEY. It is usually
+   it's in the url `https://api.airtable.com/v0/YOUR_BASE_KEY`. It is usually
    app then an alphanumeric string)
  * Your Airtable api key (This would be on your account page after enabling
    api access. (It is preferable to store this in the environment variable

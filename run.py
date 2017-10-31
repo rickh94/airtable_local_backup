@@ -18,10 +18,10 @@ def main():
 
     downloadtable = download.DownloadTable(base_key=BASE, table_name=TABLE)
     all_data = []
-    for item in downloadtable.download_table():
+    for item in downloadtable.download():
         all_data.append(item)
 
-    # all_data = list(downloadtable.download_table())
+    # all_data = list(downloadtable.download())
     # with open('tests/lots_of_fields_data.pickle', 'wb') as datafile:
     #     pickle.dump(all_data, datafile)
 

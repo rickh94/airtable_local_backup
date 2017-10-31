@@ -1,9 +1,13 @@
 import os
 from pathlib import Path
+
+from airtable import Airtable
 import pytest
+import requests
 
 from airtable_local_backup import runner
 from airtable_local_backup.exceptions import ConfigurationError
+from airtable_local_backup.file_io import _normalize
 
 HERE = os.path.dirname(__file__)
 DATA = Path(HERE, 'testdata')
@@ -66,3 +70,30 @@ def test_create_backup_tables(testrunner, table_names, bad_testrunner):
     assert table_names == [], "All tables should have been removed"
     with pytest.raises(ConfigurationError):
         list(bad_testrunner._create_backup_tables())
+
+
+def rettrue(*args):
+    return True
+
+
+def test_save_tables(testrunner, table_names, monkeypatch,
+                     lots_of_fields_raw, filedata):
+    monkeypatch.setattr(Airtable, 'validate_session', rettrue)
+    monkeypatch.setenv('AIRTABLE_API_KEY', 'key123456')
+
+    def ret_data(*args):
+        return lots_of_fields_raw
+
+    def get_attach_patched(url):
+        class FakeDownload():
+            def __init__(self, data):
+                self.content = data.encode('utf-8')
+        return FakeDownload(filedata[url])
+
+    monkeypatch.setattr(Airtable, 'get_all', ret_data)
+    monkeypatch.setattr(requests, 'get', get_attach_patched)
+
+    testrunner._save_tables()
+    for table in table_names:
+        name = _normalize(table)
+        assert f'{name}.json' in testrunner.tmp.listdir('/')
