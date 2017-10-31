@@ -8,27 +8,28 @@ Airtable Base Key: app123456
 # AIRTABLE_API_KEY. Leave this as none to read from that variable.
 Airtable API Key: null
 # Whether to store as a package or flat files. Available options:
-# tar, zip, files
+# tar, zip, files,
 # if tar is specified, you may also specify compression as xz, bz2, or gz
+# if it is not flat files, specify a filename to save the zip or tar under.
 Store As:
  Type: tar
  Compression: xz
+ Path: /tmp/testbackup.tar.xz
 # where to put the final backup. Specify a uri as documented at
 # http://pyfilesystem2.readthedocs.io/en/latest/builtin.html for osfs,
 # mountfs, ftpfs. You can use non-native filesystems (e.g. sshfs) but you will
 # need to install the corresponding extensions to pyfilesystem2. Obviously this
 # must be accessible to the backup program when it runs.
 # Backing Store:
-#   - URI: /home/backupuser/backups
-# You may also specify S3 or S3-compat. For s3 or s3 compatible service.
+#   URI: /home/backupuser/backups
+# You may also specify S3 for s3 or s3 compatible service.
 # It is recommended that you use external authentication for S3 (env vars or
 # IAM roles), but you may specify Key ID and Secret Key, preferably through
 # env vars.
+# Be sure to specify Endpoint URL and ensure authentication for S3 compatible services
 # Specify Date: True for adding date information to the backup file/folders.
 Backing Store:
-  Type: S3
-  Prefix: backupfolder/
-  Date: True
+  URI: /tmp/testbackupdir
 # Specify any tables to back up in this section. It is crucial that this be
 # accurate or data will be missed. If tables are added or names are changed,
 # the configuration file must be updated or it will create errors or missed data.
@@ -62,11 +63,14 @@ Tables:
       Checkbox: Checkbox
       Email: Email
 # How to handle attachments:
+Attachments:
+  Discard: False # if true attachments will be discarded
+  Compress: True # allowed options: True, False
 # Restore Config (optional). If this is missing automatic restoring will be
 # disabled.
 # where to put attachments when restoring
 Attachment Store:
-  Type: S3-compat
+  Type: S3
   Bucket: testairtableattachments
   Endpoint URL: https://nyc3.digitaloceanspaces.com
   Key ID: $DOKEY

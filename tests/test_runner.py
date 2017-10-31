@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from unittest import mock
 
 from airtable import Airtable
 import pytest
@@ -97,3 +98,34 @@ def test_save_tables(testrunner, table_names, monkeypatch,
     for table in table_names:
         name = _normalize(table)
         assert f'{name}.json' in testrunner.tmp.listdir('/')
+
+
+def test_configure_backing_store(testrunner, monkeypatch, bad_testrunner):
+    testfs1 = testrunner._configure_backing_store()
+    assert testfs1._bucket_name == 'mybackupbucket'
+    assert testfs1.aws_access_key_id is None
+    assert testfs1.aws_secret_access_key is None
+    assert testfs1.endpoint_url is None
+    assert testfs1.strict is False
+    testfs1.close()
+
+    monkeypatch.setenv('DOKEY', 'testkeyid')
+    monkeypatch.setenv('DOSECRET', 'testsecretkey')
+    test2runner = runner.Runner(str(Path(DATA, 'testconf-2.yml')))
+    testfs2 = test2runner._configure_backing_store()
+    assert testfs2._bucket_name == 'testbackupspace'
+    assert testfs2.aws_access_key_id == 'testkeyid'
+    assert testfs2.aws_secret_access_key == 'testsecretkey'
+    assert testfs2.endpoint_url == 'https://nyc3.digitaloceanspaces.com'
+    assert testfs2.strict is False
+    testfs2.close()
+
+    test3runner = runner.Runner(str(Path(DATA, 'testconf-3.yml')))
+    testfs3 = test3runner._configure_backing_store()
+    assert testfs3.root_path == '/tmp/testbackupdir'
+    testfs3.close()
+    assert os.path.exists('/tmp/testbackupdir')
+    assert os.path.isdir('/tmp/testbackupdir')
+
+    with pytest.raises(ConfigurationError):
+        bad_testrunner._configure_backing_store()

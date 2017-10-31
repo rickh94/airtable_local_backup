@@ -110,7 +110,7 @@ class Runner(object):
                 if bs['Type'].lower() == 's3':
                     return S3FS(
                         bs['Bucket'],
-                        srict=False,
+                        strict=False,
                         aws_access_key_id=bs.get('Key ID', None),
                         aws_secret_access_key=bs.get('Secret Key', None),
                         endpoint_url=bs.get('Endpoint URL', None)
@@ -126,6 +126,7 @@ def _config_error(err=''):
         "Options are missing in the configuration file. "
         f"Please consult the docs at {__docurl__}.\n"
         f"{err}")
+
 
 def _get_from_env(item):
     if item is None:
