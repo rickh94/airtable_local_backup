@@ -1,8 +1,9 @@
 import os
 from pathlib import Path
-from unittest import mock
+# from unittest import mock
 
 from airtable import Airtable
+from fs import open_fs
 import pytest
 import requests
 
@@ -25,9 +26,23 @@ def badconf_yml():
 
 
 @pytest.fixture
-def testrunner(testconf_yml):
-    return runner.Runner(path=testconf_yml)
+def testrunner(testconf_yml, monkeypatch, lots_of_fields_raw,
+                filedata):
+    monkeypatch.setattr(Airtable, 'validate_session', rettrue)
+    monkeypatch.setenv('AIRTABLE_API_KEY', 'key123456')
 
+    def ret_data(*args):
+        return lots_of_fields_raw
+
+    def get_attach_patched(url):
+        class FakeDownload():
+            def __init__(self, data):
+                self.content = data.encode('utf-8')
+        return FakeDownload(filedata[url])
+
+    monkeypatch.setattr(Airtable, 'get_all', ret_data)
+    monkeypatch.setattr(requests, 'get', get_attach_patched)
+    return runner.Runner(path=testconf_yml)
 
 @pytest.fixture
 def bad_testrunner(badconf_yml):
@@ -77,23 +92,7 @@ def rettrue(*args):
     return True
 
 
-def test_save_tables(testrunner, table_names, monkeypatch,
-                     lots_of_fields_raw, filedata):
-    monkeypatch.setattr(Airtable, 'validate_session', rettrue)
-    monkeypatch.setenv('AIRTABLE_API_KEY', 'key123456')
-
-    def ret_data(*args):
-        return lots_of_fields_raw
-
-    def get_attach_patched(url):
-        class FakeDownload():
-            def __init__(self, data):
-                self.content = data.encode('utf-8')
-        return FakeDownload(filedata[url])
-
-    monkeypatch.setattr(Airtable, 'get_all', ret_data)
-    monkeypatch.setattr(requests, 'get', get_attach_patched)
-
+def test_save_tables(testrunner, table_names):
     testrunner._save_tables()
     for table in table_names:
         name = _normalize(table)
@@ -129,3 +128,13 @@ def test_configure_backing_store(testrunner, monkeypatch, bad_testrunner):
 
     with pytest.raises(ConfigurationError):
         bad_testrunner._configure_backing_store()
+
+
+def test_package(testrunner, tmpdir, table_names):
+    testfile = Path(tmpdir, 'testtar.tar')
+    testrunner._save_tables()
+    testrunner._package(str(testfile))
+    testtar = open_fs(f"tar://{testfile}")
+    for name in table_names:
+        assert f"{_normalize(name)}.json" in testtar.listdir('/')
+
