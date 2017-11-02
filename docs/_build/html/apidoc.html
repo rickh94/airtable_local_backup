@@ -47,7 +47,7 @@ functions available to the api.</p>
 <h2>Automated Runner<a class="headerlink" href="#automated-runner" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="airtable_local_backup.runner.Runner">
-<em class="property">class </em><code class="descclassname">airtable_local_backup.runner.</code><code class="descname">Runner</code><span class="sig-paren">(</span><em>path</em>, <em>*</em>, <em>filesystem=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/runner.html#Runner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.runner.Runner" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">Runner</code><span class="sig-paren">(</span><em>path</em>, <em>*</em>, <em>filesystem=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/runner.html#Runner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.runner.Runner" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class handles orchestration of downloading and storing the backup.
 Options are set in a yaml configuration file. There is an
 <a class="reference download internal" href="_downloads/sample-config.yaml" download=""><code class="xref download docutils literal"><span class="pre">example</span></code></a> you can use as a
@@ -75,7 +75,7 @@ file is located.</li>
 <h3>Download Table<a class="headerlink" href="#download-table" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="airtable_local_backup.download.DownloadTable">
-<em class="property">class </em><code class="descclassname">airtable_local_backup.download.</code><code class="descname">DownloadTable</code><span class="sig-paren">(</span><em>base_key</em>, <em>table_name</em>, <em>api_key=None</em>, <em>progress=False</em>, <em>compression=True</em>, <em>fields={}</em>, <em>discard_attach=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/download.html#DownloadTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.download.DownloadTable" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descname">DownloadTable</code><span class="sig-paren">(</span><em>base_key</em>, <em>table_name</em>, <em>api_key=None</em>, <em>progress=False</em>, <em>compression=True</em>, <em>fields={}</em>, <em>discard_attach=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/download.html#DownloadTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.download.DownloadTable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Downloads all data from a table including atachments.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -117,7 +117,7 @@ iterated based on the options configured.</td>
 <span id="file-i-o"></span><h3>File I/O<a class="headerlink" href="#module-airtable_local_backup.file_io" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="airtable_local_backup.file_io.join_files">
-<code class="descclassname">airtable_local_backup.file_io.</code><code class="descname">join_files</code><span class="sig-paren">(</span><em>tmpfs</em>, <em>outfs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/file_io.html#join_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.file_io.join_files" title="Permalink to this definition">¶</a></dt>
+<code class="descname">join_files</code><span class="sig-paren">(</span><em>tmpfs</em>, <em>outfs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/file_io.html#join_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.file_io.join_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Join the backup json files into a single package (tarball, zip).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -136,7 +136,7 @@ like compression and encoding should be specified at instantiation.</li>
 
 <dl class="function">
 <dt id="airtable_local_backup.file_io.write_out_backup">
-<code class="descclassname">airtable_local_backup.file_io.</code><code class="descname">write_out_backup</code><span class="sig-paren">(</span><em>backing_store_fs</em>, <em>*</em>, <em>filepath=None</em>, <em>filesystem=None</em>, <em>prefix=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/file_io.html#write_out_backup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.file_io.write_out_backup" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_out_backup</code><span class="sig-paren">(</span><em>backing_store_fs</em>, <em>*</em>, <em>filepath=None</em>, <em>filesystem=None</em>, <em>prefix=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/file_io.html#write_out_backup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.file_io.write_out_backup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the backup data to its final location. A backing store is required
 and either a filepath to the packaged backup or the tmp filesystem is required.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -164,7 +164,7 @@ a directory or pseudo-directory structure.</li>
 
 <dl class="function">
 <dt id="airtable_local_backup.file_io.write_to_file">
-<code class="descclassname">airtable_local_backup.file_io.</code><code class="descname">write_to_file</code><span class="sig-paren">(</span><em>downloadtable</em>, <em>tmpfs</em>, <em>prefix=''</em>, <em>suffix=''</em>, <em>fields={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/file_io.html#write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.file_io.write_to_file" title="Permalink to this definition">¶</a></dt>
+<code class="descname">write_to_file</code><span class="sig-paren">(</span><em>downloadtable</em>, <em>tmpfs</em>, <em>prefix=''</em>, <em>suffix=''</em>, <em>fields={}</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/airtable_local_backup/file_io.html#write_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#airtable_local_backup.file_io.write_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write out the table data to a file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

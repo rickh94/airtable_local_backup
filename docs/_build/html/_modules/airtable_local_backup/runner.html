@@ -151,7 +151,7 @@
                 <span class="k">if</span> <span class="n">bs</span><span class="p">[</span><span class="s1">&#39;Type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;s3&#39;</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">S3FS</span><span class="p">(</span>
                         <span class="n">bs</span><span class="p">[</span><span class="s1">&#39;Bucket&#39;</span><span class="p">],</span>
-                        <span class="n">srict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                         <span class="n">aws_access_key_id</span><span class="o">=</span><span class="n">bs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Key ID&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                         <span class="n">aws_secret_access_key</span><span class="o">=</span><span class="n">bs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Secret Key&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                         <span class="n">endpoint_url</span><span class="o">=</span><span class="n">bs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;Endpoint URL&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -167,6 +167,7 @@
         <span class="s2">&quot;Options are missing in the configuration file. &quot;</span>
         <span class="n">f</span><span class="s2">&quot;Please consult the docs at </span><span class="si">{__docurl__}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="n">f</span><span class="s2">&quot;</span><span class="si">{err}</span><span class="s2">&quot;</span><span class="p">)</span>
+
 
 <span class="k">def</span> <span class="nf">_get_from_env</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

@@ -43,7 +43,7 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">fs.copy</span> <span class="k">import</span> <span class="n">copy_fs</span>
-<span class="kn">from</span> <span class="nn">fs.errors</span> <span class="k">import</span> <span class="n">ResourceNotFound</span>
+<span class="kn">from</span> <span class="nn">fs.errors</span> <span class="k">import</span> <span class="n">ResourceNotFound</span><span class="p">,</span> <span class="n">FileExists</span><span class="p">,</span> <span class="n">DirectoryExists</span>
 
 
 <span class="k">def</span> <span class="nf">_normalize</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
@@ -122,8 +122,13 @@
         <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">backing_fs</span> <span class="ow">in</span> <span class="n">backing_store_fs</span><span class="p">:</span>
             <span class="c1"># read outfile directly from infile</span>
-            <span class="k">with</span> <span class="n">backing_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+            <span class="c1"># if not backing_fs.</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">backing_fs</span><span class="o">.</span><span class="n">makedir</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">DirectoryExists</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">with</span> <span class="n">backing_fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
                     <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
     <span class="k">elif</span> <span class="n">filesystem</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">backing_fs</span> <span class="ow">in</span> <span class="n">backing_store_fs</span><span class="p">:</span>
