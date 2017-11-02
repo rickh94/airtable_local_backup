@@ -2,7 +2,7 @@ import os
 import json
 import re
 from fs.copy import copy_fs
-from fs.errors import ResourceNotFound
+from fs.errors import ResourceNotFound, FileExists, DirectoryExists
 
 
 def _normalize(name):
@@ -81,8 +81,13 @@ def write_out_backup(backing_store_fs, *, filepath=None, filesystem=None,
         name = os.path.basename(filepath)
         for backing_fs in backing_store_fs:
             # read outfile directly from infile
-            with backing_fs.open(prefix + name, 'w') as outfile:
-                with open(filepath, 'r') as infile:
+            # if not backing_fs.
+            try:
+                backing_fs.makedir(prefix)
+            except DirectoryExists:
+                pass
+            with backing_fs.open(prefix + name, 'wb') as outfile:
+                with open(filepath, 'rb') as infile:
                     outfile.write(infile.read())
     elif filesystem:
         for backing_fs in backing_store_fs:

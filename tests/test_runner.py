@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-# from unittest import mock
+from unittest import mock
 
 from airtable import Airtable
 from fs import open_fs
@@ -138,3 +138,13 @@ def test_package(testrunner, tmpdir, table_names):
     for name in table_names:
         assert f"{_normalize(name)}.json" in testtar.listdir('/')
 
+
+def test_backup(testrunner, bad_testrunner, tmpdir, monkeypatch):
+    dirnumber = [0]
+    def localfs(*args):
+        name = f"backup{dirnumber[0]}"
+        path = Path(tmpdir, name)
+        dirnumber[0] += 1
+        return open_fs(str(path), create=True)
+    monkeypatch.setattr(testrunner, '_configure_backing_store', localfs)
+    testrunner.backup()
