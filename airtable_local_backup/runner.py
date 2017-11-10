@@ -31,7 +31,7 @@ class Runner(object):
         yaml = YAML()
         if not filesystem:
             filesystem = fs.open_fs('/')
-        with filesystem.open(path, 'r') as configfile:
+        with filesystem.open(str(path), 'r') as configfile:
             self.config = yaml.load(configfile)
         self.tmp = tempfs.TempFS()
 
@@ -58,10 +58,10 @@ class Runner(object):
     def _package(self, outfile):
         os.makedirs(os.path.dirname(outfile), exist_ok=True)
         if self.config['Store As']['Type'].lower() == 'tar':
-            savefs = tarfs.TarFS(outfile,
-                                 write=True,
-                                 compression=self.config['Store As']['Compression']
-                                 )
+            savefs = tarfs.TarFS(
+                outfile, write=True,
+                compression=self.config['Store As']['Compression']
+            )
         elif self.config['Store As']['Type'].lower() == 'zip':
             savefs = zipfs.ZipFS(outfile)
         else:
