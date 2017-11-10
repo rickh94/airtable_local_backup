@@ -35,6 +35,6 @@ setup(
         'ruamel.yaml'
     ],
     tests_require=['pytest', 'pytest-cov'],
-    setup_requires=['pytest-runner'],
+    # setup_requires=['pytest-runner'],
 
 )
