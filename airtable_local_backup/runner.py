@@ -56,6 +56,7 @@ class Runner(object):
             file_io.write_to_file(table, self.tmp)
 
     def _package(self, outfile):
+        os.makedirs(os.path.dirname(outfile), exist_ok=True)
         if self.config['Store As']['Type'].lower() == 'tar':
             savefs = tarfs.TarFS(outfile,
                                  write=True,
