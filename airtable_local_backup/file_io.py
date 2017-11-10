@@ -17,7 +17,7 @@ def _make_file_name(tablename, prefix, suffix):
     return prefix + _normalize(tablename) + suffix + '.json'
 
 
-def write_to_file(downloadtable, tmpfs, prefix='', suffix='', fields=dict()):
+def write_to_file(downloadtable, tmpfs, prefix='', suffix=''):
     """
     Write out the table data to a file.
 
@@ -34,7 +34,7 @@ def write_to_file(downloadtable, tmpfs, prefix='', suffix='', fields=dict()):
         tmpfs.makedir(prefix)
     tagged_data = {
         'table_name': downloadtable.table_name,
-        'fields': fields,
+        'fields': downloadtable.fields,
         'data': data
     }
     with tmpfs.open(filename, 'w') as outfile:

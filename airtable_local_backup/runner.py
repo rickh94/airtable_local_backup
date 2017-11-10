@@ -86,7 +86,10 @@ class Runner(object):
             prefix = self.config['Backing Store'].get('Prefix', '')
             if self.config['Backing Store'].get('Date', False):
                 date = datetime.datetime.today().isoformat()
-                prefix = date + '-' + prefix
+                if prefix:
+                    prefix = date + '-' + prefix
+                else:
+                    prefix = date
         except KeyError as err:
             _config_error(err)
         if outfile:
