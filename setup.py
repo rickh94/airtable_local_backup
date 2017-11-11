@@ -31,7 +31,6 @@ setup(
         'fs',
         'fs-s3fs',
         'better_exceptions',
-        'ruamel.yaml'
     ],
     tests_require=['pytest', 'pytest-cov'],
     # setup_requires=['pytest-runner'],
