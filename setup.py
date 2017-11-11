@@ -27,7 +27,6 @@ setup(
 
     install_requires=[
         'requests',
-        'airtable_python_wrapper',
         'boto3',
         'fs',
         'fs-s3fs',
