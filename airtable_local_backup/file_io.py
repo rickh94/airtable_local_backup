@@ -21,12 +21,14 @@ def write_to_file(downloadtable, tmpfs, prefix='', suffix=''):
     """
     Write out the table data to a file.
 
-    :param downloadtable: A `download.DownloadTable` object for the table to be saved
+    :param downloadtable: A `download.DownloadTable` object for the table to be
+        saved
+
     :param tmpfs: the temporary filesystem (from pyfilesystem2) to write the
             file to.
+            
     :param prefix: A prefix for a the file name. include a / for directories
     :param suffix: A suffix to append to the file name
-    :param fields: a dict of the fields and type of data in the field for easier restoring.
     """
     data = list(downloadtable.download())
     filename = _make_file_name(downloadtable.table_name, prefix, suffix)
