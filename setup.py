@@ -1,6 +1,5 @@
 from os import path
 from setuptools import setup, find_packages
-from airtable_local_backup import __version__
 
 HERE = path.abspath(path.dirname(__file__))
 VERS = '0.1a1'
