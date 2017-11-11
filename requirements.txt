@@ -1,4 +1,4 @@
-airtable_python_wrapper
+-e git://github.com/gtalarico/airtable-python-wrapper.git#egg=airtable-python-wrapper
 requests
 fs
 fs-s3fs
