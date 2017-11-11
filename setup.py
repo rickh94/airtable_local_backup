@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 from airtable_local_backup import __version__
 
 HERE = path.abspath(path.dirname(__file__))
-VERS = __version__
+VERS = '0.1a1'
 DESC = 'Script to create local backups from airtable databases'
 
 with open(path.join(HERE, 'README.rst'), 'r') as f:
