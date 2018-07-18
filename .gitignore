@@ -6,3 +6,4 @@ big-binaries
 scratch
 lots_of_fields_data.pickle
 .idea
+_build

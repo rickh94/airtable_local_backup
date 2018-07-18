@@ -53,7 +53,7 @@ def prepare_records(table_data, *, s3fs=None, check_integrity=True,
         s3fs: an fs_s3fs.S3FS object for uploading files and generating urls
             see s3fs documentation for usage with s3 or s3 compatible
             services.
-        check_itegrity: bool whether to run hash to check
+        check_integrity: bool whether to run hash to check
         data integrity
         prefix: a prefix to add to objects. include a / for folders.
     Yields: a generator of json objects for uploading to airtable with s3

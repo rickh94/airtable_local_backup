@@ -5,7 +5,7 @@ Base Name: TestDB
 # Backup Config (required)
 Airtable Base Key: app123456
 # It is best to specify the airtable api key in an env variable
-# AIRTABLE_API_KEY. Leave this as none to read from that variable.
+# AIRTABLE_API_KEY. Leave this as null to read from that variable.
 Airtable API Key: null
 # Whether to store as a package or flat files. Available options:
 # tar, zip, files

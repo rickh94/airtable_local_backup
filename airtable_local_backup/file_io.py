@@ -26,7 +26,7 @@ def write_to_file(downloadtable, tmpfs, prefix='', suffix=''):
 
     :param tmpfs: the temporary filesystem (from pyfilesystem2) to write the
             file to.
-            
+
     :param prefix: A prefix for a the file name. include a / for directories
     :param suffix: A suffix to append to the file name
     """
