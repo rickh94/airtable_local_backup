@@ -85,7 +85,7 @@ def test_join_files(tmpdir, filedata, tmp_fs, monkeypatch):
 def tarfile(tmpdir_factory, filedata, tmp_fs):
     tardir = tmpdir_factory.mktemp('tar_fixture')
     path = Path(tardir, 'stuff.tar')
-    tar_fs = tarfs.TarFS(path, write=True)
+    tar_fs = tarfs.TarFS(str(path), write=True)
     copy_fs(tmp_fs, tar_fs)
     tar_fs.close()
     return path
