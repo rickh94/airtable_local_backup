@@ -15,6 +15,7 @@ fs = "*"
 "fs-s3fs" = "*"
 ruamel-yaml = "*"
 better-exceptions = "*"
+sphinx-rtd-theme = "*"
 
 
 [dev-packages]
