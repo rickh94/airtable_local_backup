@@ -5,3 +5,4 @@ fs-s3fs
 better_exceptions
 ruamel.yaml
 recommonmark
+airtable
